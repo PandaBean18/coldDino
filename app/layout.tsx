@@ -3,7 +3,7 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "Cold Mailer",
+  title: "ColdDino",
   description: "Automate Personalization of your cold emails using AI",
 };
 
