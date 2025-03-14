@@ -1,6 +1,7 @@
 "use client"
 import Image from "next/image";
 import { useState, useEffect } from "react";
+
 export default function Home() {
   const values = ["coolCoffeeStartup.com", "greatIndianBirds.in", "tastyBakedCookies.com", "crazyCandies.org", "fabulousFintech.com", "amazingAerospace.com", "poshPublishers.com"];
   const emails = ["hr@coolCoffeeStartup.com", "people@greatIndianBirds.in", "natasha@tastyBakedCookies.com", "cook@crazyCandies.org", "cto@fabulousFintech.com", "kevin@amazingAerospace.com", "editor@poshPublishers.com"]
@@ -77,6 +78,13 @@ export default function Home() {
     <div className="h-full w-full select-none">
       <div className="flex w-full h-[75px] bg-white justify-between select-none">
         <div className="h-full w-min flex justify-center items-center ml-[20px]">
+          <Image 
+            src="/logo.svg"
+            height={30}
+            width={30}
+            alt="logo"
+            className="mr-[10px] ml-[10px]"
+          />
           <p className="text-black text-2xl font-bold">ColdDino</p>
         </div>
         <div className="flex justify-between h-full w-fit items-center">
