@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 import axios from "axios";
 import { jwtVerify } from "jose";
+import Cookies from "js-cookie"
 
 declare global {
     interface Window {
@@ -53,7 +54,7 @@ export default function signin() {
             if (v.protectedHeader.kid !== resp.data.keys[0].kid) {
                 alert("Login failed");
             } else {
-                
+                Cookies.set("coldDinoJwt", token);
             }
         }
     }, [])
