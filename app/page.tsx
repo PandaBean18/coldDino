@@ -1,8 +1,31 @@
 "use client"
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { jwtVerify } from "jose";
+import Cookies from "js-cookie";
+import axios from "axios";
+
+declare global {
+  interface Window {
+      handleRedirect:any;
+  }
+}
 
 export default function Home() {
+  interface individualKeyInterface {
+    kid: string,
+    n: string,
+  }
+
+  interface keysInterface {
+    keys: Array<individualKeyInterface>
+  }
+
+  interface googleCertsResp {
+    data: keysInterface,
+    status: number,
+  }
+
   const values = ["coolCoffeeStartup.com", "greatIndianBirds.in", "tastyBakedCookies.com", "crazyCandies.org", "fabulousFintech.com", "amazingAerospace.com", "poshPublishers.com"];
   const emails = ["hr@coolCoffeeStartup.com", "people@greatIndianBirds.in", "natasha@tastyBakedCookies.com", "cook@crazyCandies.org", "cto@fabulousFintech.com", "kevin@amazingAerospace.com", "editor@poshPublishers.com"]
   const subjects = [
@@ -74,6 +97,35 @@ export default function Home() {
     return () => clearInterval(interval);
 }, []);
 
+  let authUri = "/signin"
+
+  function handleRedirect() {
+    window.location.href = authUri;
+  }
+
+  useEffect(() => {
+    window.onload = async function () {
+      const jwt = Cookies.get("coldDinoJwt");
+
+      if (jwt === undefined || jwt === null) {
+        return;
+      }
+
+      const resp: googleCertsResp = await axios.get("https://www.googleapis.com/oauth2/v3/certs");
+      let v = await jwtVerify(jwt, resp.data.keys[0]);
+      const date = new Date();
+      const time = date.getTime() / 1000;
+      if ((v.payload.exp === undefined) || (time > v.payload.exp!)) {
+        return;
+      } else if (v.protectedHeader.kid !== resp.data.keys[0].kid) {
+        return;
+      }
+
+      authUri = "/dashboard";
+    }
+
+  }, [])
+
   return (
     <div className="h-full w-full select-none">
       <div className="flex w-full h-[75px] bg-white justify-between select-none">
@@ -91,9 +143,9 @@ export default function Home() {
           <div className="justify-evenly hidden sm:flex">
             <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer">Features</p></div>
             <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer">Pricing</p></div>
-            <div className="p-[5px] pr-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer">Login</p></div>
+            <div className="p-[5px] pr-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={handleRedirect}>Login</p></div>
           </div>
-          <div className="ml-[10px] h-[70%] pl-[15px] pr-[15px] flex justify-center items-center text-white bg-black font-medium rounded-md hover:cursor-pointer mr-[20px]">
+          <div className="ml-[10px] h-[70%] pl-[15px] pr-[15px] flex justify-center items-center text-white bg-black font-medium rounded-md hover:cursor-pointer mr-[20px]" onClick={handleRedirect}>
             <p>Get Started</p>
           </div>
         </div>
@@ -179,7 +231,7 @@ export default function Home() {
           </div>
           <div className="w-[calc(100%-50px)] flex justify-center items-center">
             <div className="w-full mbp:w-[60%]">
-              <p className="text-black text-xl mbp:text-3xl">Firstly start by creating an email template. This template is what will be sent to your cold contact and the AI generated content will be embeded into this.</p>
+              <p className="text-black text-xl mbp:text-2xl">Firstly start by creating an email template. This template is what will be sent to your cold contact and the AI generated content will be embeded into this.</p>
               <br />
             </div>
           </div>
@@ -191,7 +243,7 @@ export default function Home() {
           </div>
           <div className="w-[calc(100%-50px)] flex justify-center items-center">
             <div className="w-full mbp:w-[60%]">
-              <p className="text-black text-xl mbp:text-3xl">Then, upload the email id of the representative of the company that you wish to contact. Make sure that the mail that you upload is in the format of name@domainName.com!</p>
+              <p className="text-black text-xl mbp:text-2xl">Then, upload the email id of the representative of the company that you wish to contact. Make sure that the mail that you upload is in the format of name@domainName.com!</p>
               <br />
             </div>
           </div>
@@ -203,7 +255,7 @@ export default function Home() {
           </div>
           <div className="w-[calc(100%-50px)] flex justify-center items-center">
             <div className="w-full mbp:w-[60%]">
-              <p className="text-black text-xl mbp:text-3xl">Now sit back and let our AI agent figure out what the company does and prepare a brief summary that looks just like you wrote it! Once done searching, the application will paste this into your email template, and the email will be ready to be sent.</p>
+              <p className="text-black text-xl mbp:text-2xl">Now sit back and let our AI agent figure out what the company does and prepare a brief summary that looks just like you wrote it! Once done searching, the application will paste this into your email template, and the email will be ready to be sent.</p>
               <br />
             </div>
           </div>
@@ -214,30 +266,30 @@ export default function Home() {
           </div>
           <div className="w-[calc(100%-50px)] flex justify-center items-center">
             <div className="w-full mbp:w-[60%]">
-              <p className="text-black text-xl mbp:text-3xl">Once done, you can proof read the email and send it directly from our app, or save it to your drafts and send it later from your mailbox.</p>
+              <p className="text-black text-xl mbp:text-2xl">Once done, you can proof read the email and send it directly from our app, or save it to your drafts and send it later from your mailbox.</p>
               <br />
             </div>
           </div>
         </div>
       </div>
-      <div className="w-full lg:h-[300px] bg-[#121212] pt-[30px] flex justify-around items-center">
+      <div className="w-full lg:h-[300px] bg-zinc-300 pt-[30px] flex justify-around items-center">
         <div className="h-full w-[95%] flex items-center justify-between flex-col lg:flex-row">
           <div className="w-full lg:w-[30%] lg:h-[90%] flex flex-col items-center">
-            <p className="text-neutral-300 text-2xl text-center font-bold">Automate Email Personalization</p>
+            <p className="text-black text-2xl text-center font-bold">Automate Email Personalization</p>
             <br />
-            <p className="text-neutral-100 text-xl text-left">Even though you may know what the company does, it might be hard for you to put into perspective why you want to be working with them, and while cold mailing multiple companies, its easy to loose track.</p>
+            <p className="text-[#121212] text-xl text-left">Even though you may know what the company does, it might be hard for you to put into perspective why you want to be working with them, and while cold mailing multiple companies, its easy to loose track.</p>
           </div>
-          <div className="w-[90%] h-[1px] lg:w-[1px] lg:h-[90%] border-zinc-300 border-t-1 border-b-1 mt-[20px] mb-[20px] lg:border-r-1 lg:border-l-1 lg:border-t-0 lg:border-b-0 lg:mr-[20px] lg:ml-[20px]"></div>
+          <div className="w-[90%] h-[1px] lg:w-[1px] lg:h-[90%] border-[#121212] border-t-1 border-b-1 mt-[20px] mb-[20px] lg:border-r-1 lg:border-l-1 lg:border-t-0 lg:border-b-0 lg:mr-[20px] lg:ml-[20px]"></div>
           <div className="w-full lg:w-[30%] lg:h-[90%] flex flex-col grow-1  items-center">
-            <p className="text-neutral-300 text-2xl text-center font-bold">Send emails straight from the site</p>
+            <p className="text-black text-2xl text-center font-bold">Send emails straight from the site</p>
             <br />
-            <p className="text-neutral-100 text-xl text-left">You can send the emails after they have been generated straight from this site! No need to copy the message and send it from your mailbox, or you can save it in your drafts.</p>
+            <p className="text-[#121212] text-xl text-left">You can send the emails after they have been generated straight from this site! No need to copy the message and send it from your mailbox, or you can save it in your drafts.</p>
           </div>
-          <div className="w-[90%] h-[1px] lg:w-[1px] lg:h-[90%] border-zinc-300 border-t-1 border-b-1 mt-[20px] mb-[20px] lg:border-r-1 lg:border-l-1 lg:border-t-0 lg:border-b-0 lg:mr-[20px] lg:ml-[20px]"></div>
+          <div className="w-[90%] h-[1px] lg:w-[1px] lg:h-[90%] border-[#121212] border-t-1 border-b-1 mt-[20px] mb-[20px] lg:border-r-1 lg:border-l-1 lg:border-t-0 lg:border-b-0 lg:mr-[20px] lg:ml-[20px]"></div>
           <div className="w-full lg:w-[30%] lg:h-[90%] grow-1 flex flex-col items-center">
-            <p className="text-neutral-300 text-2xl text-center font-bold">Send emails in batches</p>
+            <p className="text-black text-2xl text-center font-bold">Send emails in batches</p>
             <br />
-            <p className="text-neutral-100 text-xl text-left">Instead of sending the emails one at a time, you can upload a CSV file containing upto 20 emails of contacts that you wish to send cold emails to. The app will automatically parse them! (Coming soon)</p>
+            <p className="text-[#121212] text-xl text-left">Instead of sending the emails one at a time, you can upload a CSV file containing upto 20 emails of contacts that you wish to send cold emails to. The app will automatically parse them! (Coming soon)</p>
           </div>  
         </div>
       </div>
