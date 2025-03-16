@@ -103,89 +103,8 @@ export default function Dashboard() {
         return l;
     }
 
-    let prevCompanyNameCountArray = [0];
-    let currentDiv = 1;
-
-    function companyNametagEventListener(event: Event, divNo: number) { 
-        const prevCompanyNameCount = prevCompanyNameCountArray[divNo-1];
-        const subjectInput = document.getElementById(`newTemplateSubjectDiv${divNo}`);
-        const text = subjectInput!.innerText;
-        let characterCount = getCountCharactersBefore(subjectInput!);
-        const characterCountDup = characterCount;
-
-        if (characterCount < ("@companyName".length)) {
-            return;
-        }
-
-        subjectInput!.innerText = "";
-
-        let lastAppended: boolean = false;
-        let i = 0;
-        let currentCompanyNameCount = 0;
-        let companyNameAtStart: boolean = false
-        let companyNameBeforeCursor = 0;
-        for(i = 0; i <= (text!.length - "@companyName".length); i++) {
-            if (text!.slice(i, i+("@companyName".length)) === "@companyName") {
-                const d = createCompanyNameTag();
-                subjectInput!.appendChild(d);
-
-                if (i < characterCountDup) {
-                    if (i === 0) {
-                        characterCount -= "@companyName".length;
-                        companyNameAtStart = true;
-                    } else  {
-                        characterCount -= "@companyName\n".length;
-                    }
-                    companyNameBeforeCursor += 1;
-                }
-
-                if (i === (text!.length - "@companyName".length)) {
-                    lastAppended = true;
-                    i += ("@companyName".length);
-                    
-                } else {
-                    i += ("@companyName".length) - 1;
-                    if (text![i+1] == "\n" && text![i+2] == "\xA0") {
-                        i += 2;
-                    } else if (text![i+1] === "\n") {
-                        i += 1;
-                        characterCount += ((i <= characterCountDup) ? 1 : 0);
-                    }
-                }
-                currentCompanyNameCount += 1;
-            } else if ((text![i] === " " || text![i] === "\n") && text!.slice(i+1, i+("@companyName".length) + 1) === "@companyName") {
-                continue;
-            } else {
-                subjectInput!.appendChild(document.createTextNode(text![i]));
-            }
-        }
-
-        if (!lastAppended) {
-            subjectInput!.appendChild(document.createTextNode(text!.slice(i)));
-        } else {
-            subjectInput!.appendChild(document.createTextNode("\xA0"));
-        }
-
-        if (prevCompanyNameCount === currentCompanyNameCount) {
-            const selection = window.getSelection();
-            selection!.removeAllRanges();
-            selection!.selectAllChildren(subjectInput!);
-            selection!.collapseToStart();
-            for(let a = 0; a < (characterCount - companyNameBeforeCursor); a++) {
-                selection!.modify("move", "right", "character")
-            }
-        } else {
-            const selection = window.getSelection();
-            selection!.removeAllRanges();
-            selection!.selectAllChildren(subjectInput!);
-            selection!.collapseToStart();
-            for(let a = 0; a < (characterCount + (companyNameAtStart ? 2 : 3)); a++) {
-                selection!.modify("move", "right", "character")
-            }
-        }
-
-        prevCompanyNameCountArray[divNo-1] = currentCompanyNameCount;
-    }
+    let currentSubjectDiv = 1;
+    let currentMessageDiv = 1;
 
     function addNewSubjectDiv(event: KeyboardEvent, divNo: number) {
         let subjectInput = document.getElementById(`newTemplateSubjectDiv${divNo}`);
@@ -195,30 +114,31 @@ export default function Dashboard() {
             event.preventDefault();
             const d = document.getElementById("newTemplateSubject");
             const newDiv = document.createElement("div");
-            newDiv.id = `newTemplateSubjectDiv${currentDiv+1}`;
-            currentDiv++;
+            newDiv.id = `newTemplateSubjectDiv${currentSubjectDiv+1}`;
+            currentSubjectDiv++;
             newDiv.className = "w-max max-w-full h-[24px] flex items-center focus:outline-none text-[#121212]";
             newDiv.contentEditable = "true";
             newDiv.onclick = () => {
-                currentDiv = divNo+1;
+                currentSubjectDiv = divNo+1;
 
             }
             d!.appendChild(newDiv);
             subjectInput = newDiv;
             subjectInput.focus();
             subjectInput.addEventListener("input", (e) => {
-                companyNametagEventListener(e, currentDiv)
+                subjectTagEventListener(e, currentSubjectDiv)
             });
             subjectInput.addEventListener("keydown", (e) => {
-                addNewSubjectDiv(e, currentDiv);
+                addNewSubjectDiv(e, currentSubjectDiv);
             })
-            prevCompanyNameCountArray.push(0);
+            prevCompanyNameCountSubjectDivArray.push(0);
+            prevContentCountSubjectDivArray.push(0)
         } else if (event.key === "Backspace" && (subjectInput!.innerText === "" || subjectInput!.innerText === "\n")) {
             event.preventDefault();
             console.log("lmao")
             if (divNo != 1) {
                 subjectInput!.removeEventListener("input", (event) => {
-                    companyNametagEventListener(event, divNo);
+                    subjectTagEventListener(event, divNo);
                 })
 
                 subjectInput!.removeEventListener("keydown", (event) => {
@@ -232,7 +152,7 @@ export default function Dashboard() {
                         const selection = window.getSelection();
                         selection!.selectAllChildren(newSubject);
                         selection!.collapseToEnd();
-                        currentDiv = i;
+                        currentSubjectDiv = i;
                         break;
                     }
                     i--;
@@ -248,21 +168,21 @@ export default function Dashboard() {
                     const selection = window.getSelection();
                     selection!.selectAllChildren(newSubject);
                     selection!.collapseToEnd();
-                    currentDiv = i;
+                    currentSubjectDiv = i;
                     break;
                 }
                 i--;
             }
         } else if (event.key === "ArrowDown") {
             let i = divNo+1;
-            while (i <= prevCompanyNameCountArray.length) {
+            while (i <= prevCompanyNameCountSubjectDivArray.length) {
                 const newSubject = document.getElementById(`newTemplateSubjectDiv${i}`);
                 if (newSubject != null) {
                     newSubject!.focus();
                     const selection = window.getSelection();
                     selection!.selectAllChildren(newSubject);
                     selection!.collapseToEnd();
-                    currentDiv = i;
+                    currentSubjectDiv = i;
                     break;
                 }
                 i++;
@@ -271,38 +191,42 @@ export default function Dashboard() {
             //event.preventDefault();
             const d = document.getElementById("newTemplateSubject");
             const newDiv = document.createElement("div");
-            newDiv.id = `newTemplateSubjectDiv${currentDiv+1}`;
-            currentDiv++;
+            newDiv.id = `newTemplateSubjectDiv${currentSubjectDiv+1}`;
+            currentSubjectDiv++;
             newDiv.className = "w-max max-w-full h-[24px] flex items-center focus:outline-none text-[#121212]";
             newDiv.contentEditable = "true";
             newDiv.onclick = () => {
-                currentDiv = divNo+1;
+                currentSubjectDiv = divNo+1;
 
             }
             d!.appendChild(newDiv);
             subjectInput = newDiv;
             subjectInput.focus();
             subjectInput.addEventListener("input", (e) => {
-                companyNametagEventListener(e, currentDiv)
+                subjectTagEventListener(e, currentSubjectDiv)
             });
             subjectInput.addEventListener("keydown", (e) => {
-                addNewSubjectDiv(e, currentDiv);
+                addNewSubjectDiv(e, currentSubjectDiv);
             })
-            prevCompanyNameCountArray.push(0);
+            prevCompanyNameCountSubjectDivArray.push(0);
+            prevContentCountSubjectDivArray.push(0);
         }
     }
 
-    let prevContentCountArray = [0];
-    let currentContentDiv = 1;
 
-    function generatedTextNameTagEventListener(event: Event, divNo: number) { 
-        const prevContentCount = prevContentCountArray[divNo-1];
+    let prevContentCountMessageDivArray = [0];
+    let prevCompanyNameCountMessageDivArray = [0];
+
+    function messageContentTagEventListener(event: Event, divNo: number) { 
+        const prevContentCount = prevContentCountMessageDivArray[divNo-1];
+
+        const prevCompanyNameCount = prevCompanyNameCountMessageDivArray[divNo-1];
         const subjectInput = document.getElementById(`newTemplateContentDiv${divNo}`);
         const text = subjectInput!.innerText;
         let characterCount = getCountCharactersBefore(subjectInput!);
         const characterCountDup = characterCount;
 
-        if (characterCount < ("@generatedText".length)) {
+        if (characterCount < ("@companyName".length)) {
             return;
         }
 
@@ -313,8 +237,11 @@ export default function Dashboard() {
         let currentContentCount = 0;
         let contentAtStart: boolean = false
         let contentBeforeCursor = 0;
-        for(i = 0; i <= (text!.length - "@generatedText".length); i++) {
-            if (text!.slice(i, i+("@generatedText".length)) === "@generatedText") {
+        let currentCompanyNameCount = 0;
+        let companyNameAtStart: boolean = false
+        let companyNameBeforeCursor = 0;
+        for(i = 0; i <= (text!.length - "@companyName".length); i++) {
+            if (((text!.length - i) >= "@generatedText".length) && text!.slice(i, i+("@generatedText".length)) === "@generatedText") {
                 const d = createGeneratedTextTag();
                 subjectInput!.appendChild(d);
 
@@ -342,7 +269,43 @@ export default function Dashboard() {
                     }
                 }
                 currentContentCount += 1;
+            } else if (text!.slice(i, i+("@companyName".length)) === "@companyName") {
+                const d = createCompanyNameTag();
+                subjectInput!.appendChild(d);
+
+                if (i < characterCountDup) {
+                    if (i === 0) {
+                        console.log(1)
+                        characterCount -= "@companyName".length;
+                        companyNameAtStart = true;
+                    } else  {
+                        console.log(2)
+                        characterCount -= "@companyName\n".length;
+                    }
+                    companyNameBeforeCursor += 1;
+                }
+
+                if (i === (text!.length - "@companyName".length)) {
+                    lastAppended = true;
+                    i += ("@companyName".length);
+                    console.log(3)
+                    
+                } else {
+                    i += ("@companyName".length) - 1;
+                    if (text![i+1] == "\n" && text![i+2] == "\xA0") {
+                        console.log(4)
+                        i += 2;
+                    } else if (text![i+1] === "\n") {
+                        console.log(5)
+                        i += 1;
+                        characterCount += ((i <= characterCountDup) ? 1 : 0);
+                    }
+                }
+                currentCompanyNameCount += 1;
             } else if ((text![i] === " " || text![i] === "\n") && text!.slice(i+1, i+("@generatedText".length) + 1) === "@generatedText") {
+                continue;
+            } else if ((text![i] === " " || text![i] === "\n") && text!.slice(i+1, i+("@companyName".length) + 1) === "@companyName") {
+                console.log(6)
                 continue;
             } else {
                 subjectInput!.appendChild(document.createTextNode(text![i]));
@@ -350,17 +313,29 @@ export default function Dashboard() {
         }
 
         if (!lastAppended) {
+            console.log(7)
             subjectInput!.appendChild(document.createTextNode(text!.slice(i)));
         } else {
+            console.log(8)
             subjectInput!.appendChild(document.createTextNode("\xA0"));
         }
 
-        if (prevContentCount === currentContentCount) {
+        if (prevContentCount === currentContentCount && prevCompanyNameCount === currentCompanyNameCount) {
             const selection = window.getSelection();
             selection!.removeAllRanges();
             selection!.selectAllChildren(subjectInput!);
             selection!.collapseToStart();
-            for(let a = 0; a < (characterCount - contentBeforeCursor); a++) {
+            console.log(9)
+            for(let a = 0; a < (characterCount - (contentBeforeCursor + companyNameBeforeCursor)); a++) {
+                selection!.modify("move", "right", "character")
+            }
+        } else if (prevCompanyNameCount < currentCompanyNameCount) {
+            console.log(10)
+            const selection = window.getSelection();
+            selection!.removeAllRanges();
+            selection!.selectAllChildren(subjectInput!);
+            selection!.collapseToStart();
+            for(let a = 0; a < (characterCount + (companyNameAtStart ? 2 : 3)); a++) {
                 selection!.modify("move", "right", "character")
             }
         } else {
@@ -373,8 +348,148 @@ export default function Dashboard() {
             }
         }
 
-        prevContentCountArray[divNo-1] = currentContentCount;
+        prevContentCountMessageDivArray[divNo-1] = currentContentCount;
+        prevCompanyNameCountMessageDivArray[divNo-1] = currentCompanyNameCount;
     }
+
+    let prevContentCountSubjectDivArray = [0];
+    let prevCompanyNameCountSubjectDivArray = [0];
+
+    function subjectTagEventListener(event: Event, divNo: number) { 
+        const prevContentCount = prevContentCountSubjectDivArray[divNo-1];
+
+        const prevCompanyNameCount = prevCompanyNameCountSubjectDivArray[divNo-1];
+        const subjectInput = document.getElementById(`newTemplateSubjectDiv${divNo}`);
+        const text = subjectInput!.innerText;
+        let characterCount = getCountCharactersBefore(subjectInput!);
+        const characterCountDup = characterCount;
+
+        if (characterCount < ("@companyName".length)) {
+            return;
+        }
+
+        subjectInput!.innerText = "";
+
+        let lastAppended: boolean = false;
+        let i = 0;
+        let currentContentCount = 0;
+        let contentAtStart: boolean = false
+        let contentBeforeCursor = 0;
+        let currentCompanyNameCount = 0;
+        let companyNameAtStart: boolean = false
+        let companyNameBeforeCursor = 0;
+        for(i = 0; i <= (text!.length - "@companyName".length); i++) {
+            if (((text!.length - i) >= "@generatedText".length) && text!.slice(i, i+("@generatedText".length)) === "@generatedText") {
+                const d = createGeneratedTextTag();
+                subjectInput!.appendChild(d);
+
+                if (i < characterCountDup) {
+                    if (i === 0) {
+                        characterCount -= "@generatedText".length;
+                        contentAtStart = true;
+                    } else  {
+                        characterCount -= "@generatedText\n".length;
+                    }
+                    contentBeforeCursor += 1;
+                }
+
+                if (i === (text!.length - "@generatedText".length)) {
+                    lastAppended = true;
+                    i += ("@generatedText".length);
+                    
+                } else {
+                    i += ("@generatedText".length) - 1;
+                    if (text![i+1] == "\n" && text![i+2] == "\xA0") {
+                        i += 2;
+                    } else if (text![i+1] === "\n") {
+                        i += 1;
+                        characterCount += ((i <= characterCountDup) ? 1 : 0);
+                    }
+                }
+                currentContentCount += 1;
+            } else if (text!.slice(i, i+("@companyName".length)) === "@companyName") {
+                const d = createCompanyNameTag();
+                subjectInput!.appendChild(d);
+
+                if (i < characterCountDup) {
+                    if (i === 0) {
+                        console.log(1)
+                        characterCount -= "@companyName".length;
+                        companyNameAtStart = true;
+                    } else  {
+                        console.log(2)
+                        characterCount -= "@companyName\n".length;
+                    }
+                    companyNameBeforeCursor += 1;
+                }
+
+                if (i === (text!.length - "@companyName".length)) {
+                    lastAppended = true;
+                    i += ("@companyName".length);
+                    console.log(3)
+                    
+                } else {
+                    i += ("@companyName".length) - 1;
+                    if (text![i+1] == "\n" && text![i+2] == "\xA0") {
+                        console.log(4)
+                        i += 2;
+                    } else if (text![i+1] === "\n") {
+                        console.log(5)
+                        i += 1;
+                        characterCount += ((i <= characterCountDup) ? 1 : 0);
+                    }
+                }
+                currentCompanyNameCount += 1;
+            } else if ((text![i] === " " || text![i] === "\n") && text!.slice(i+1, i+("@generatedText".length) + 1) === "@generatedText") {
+                continue;
+            } else if ((text![i] === " " || text![i] === "\n") && text!.slice(i+1, i+("@companyName".length) + 1) === "@companyName") {
+                console.log(6)
+                continue;
+            } else {
+                subjectInput!.appendChild(document.createTextNode(text![i]));
+            }
+        }
+
+        if (!lastAppended) {
+            console.log(7)
+            subjectInput!.appendChild(document.createTextNode(text!.slice(i)));
+        } else {
+            console.log(8)
+            subjectInput!.appendChild(document.createTextNode("\xA0"));
+        }
+
+        if (prevContentCount === currentContentCount && prevCompanyNameCount === currentCompanyNameCount) {
+            const selection = window.getSelection();
+            selection!.removeAllRanges();
+            selection!.selectAllChildren(subjectInput!);
+            selection!.collapseToStart();
+            console.log(9)
+            for(let a = 0; a < (characterCount - (contentBeforeCursor + companyNameBeforeCursor)); a++) {
+                selection!.modify("move", "right", "character")
+            }
+        } else if (prevCompanyNameCount < currentCompanyNameCount) {
+            console.log(10)
+            const selection = window.getSelection();
+            selection!.removeAllRanges();
+            selection!.selectAllChildren(subjectInput!);
+            selection!.collapseToStart();
+            for(let a = 0; a < (characterCount + (companyNameAtStart ? 2 : 3)); a++) {
+                selection!.modify("move", "right", "character")
+            }
+        } else {
+            const selection = window.getSelection();
+            selection!.removeAllRanges();
+            selection!.selectAllChildren(subjectInput!);
+            selection!.collapseToStart();
+            for(let a = 0; a < (characterCount + (contentAtStart ? 2 : 3)); a++) {
+                selection!.modify("move", "right", "character")
+            }
+        }
+
+        prevContentCountSubjectDivArray[divNo-1] = currentContentCount;
+        prevCompanyNameCountSubjectDivArray[divNo-1] = currentCompanyNameCount;
+    }
+
 
     function addNewContentDiv(event: KeyboardEvent, divNo: number) {
         let subjectInput = document.getElementById(`newTemplateContentDiv${divNo}`);
@@ -384,30 +499,31 @@ export default function Dashboard() {
             event.preventDefault();
             const d = document.getElementById("newTemplateContent");
             const newDiv = document.createElement("div");
-            newDiv.id = `newTemplateContentDiv${currentContentDiv+1}`;
-            currentContentDiv++;
+            newDiv.id = `newTemplateContentDiv${currentMessageDiv+1}`;
+            currentMessageDiv++;
             newDiv.className = "w-max max-w-full h-[24px] flex items-center focus:outline-none text-[#121212]";
             newDiv.contentEditable = "true";
             newDiv.onclick = () => {
-                currentContentDiv = divNo+1;
+                currentMessageDiv = divNo+1;
 
             }
             d!.appendChild(newDiv);
             subjectInput = newDiv;
             subjectInput.focus();
             subjectInput.addEventListener("input", (e) => {
-                generatedTextNameTagEventListener(e, currentContentDiv)
+                messageContentTagEventListener(e, currentMessageDiv)
             });
             subjectInput.addEventListener("keydown", (e) => {
-                addNewContentDiv(e, currentContentDiv);
+                addNewContentDiv(e, currentMessageDiv);
             })
-            prevContentCountArray.push(0);
+            prevCompanyNameCountMessageDivArray.push(0);
+            prevContentCountMessageDivArray.push(0);
         } else if (event.key === "Backspace" && (subjectInput!.innerText === "" || subjectInput!.innerText === "\n")) {
             event.preventDefault();
             console.log("lmao")
             if (divNo != 1) {
                 subjectInput!.removeEventListener("input", (event) => {
-                    generatedTextNameTagEventListener(event, divNo);
+                    messageContentTagEventListener(event, divNo);
                 })
 
                 subjectInput!.removeEventListener("keydown", (event) => {
@@ -421,7 +537,7 @@ export default function Dashboard() {
                         const selection = window.getSelection();
                         selection!.selectAllChildren(newSubject);
                         selection!.collapseToEnd();
-                        currentContentDiv = i;
+                        currentMessageDiv = i;
                         break;
                     }
                     i--;
@@ -437,21 +553,21 @@ export default function Dashboard() {
                     const selection = window.getSelection();
                     selection!.selectAllChildren(newSubject);
                     selection!.collapseToEnd();
-                    currentContentDiv = i;
+                    currentMessageDiv = i;
                     break;
                 }
                 i--;
             }
         } else if (event.key === "ArrowDown") {
             let i = divNo+1;
-            while (i <= prevContentCountArray.length) {
+            while (i <= prevCompanyNameCountMessageDivArray.length) {
                 const newSubject = document.getElementById(`newTemplateContentDiv${i}`);
                 if (newSubject != null) {
                     newSubject!.focus();
                     const selection = window.getSelection();
                     selection!.selectAllChildren(newSubject);
                     selection!.collapseToEnd();
-                    currentContentDiv = i;
+                    currentMessageDiv = i;
                     break;
                 }
                 i++;
@@ -464,24 +580,25 @@ export default function Dashboard() {
             //event.preventDefault();
             const d = document.getElementById("newTemplateContent");
             const newDiv = document.createElement("div");
-            newDiv.id = `newTemplateContentDiv${currentContentDiv+1}`;
-            currentContentDiv++;
+            newDiv.id = `newTemplateContentDiv${currentMessageDiv+1}`;
+            currentMessageDiv++;
             newDiv.className = "w-max max-w-full h-[24px] flex items-center focus:outline-none text-[#121212]";
             newDiv.contentEditable = "true";
             newDiv.onclick = () => {
-                currentContentDiv = divNo+1;
+                currentMessageDiv = divNo+1;
 
             }
             d!.appendChild(newDiv);
             subjectInput = newDiv;
             subjectInput.focus();
             subjectInput.addEventListener("input", (e) => {
-                generatedTextNameTagEventListener(e, currentContentDiv)
+                messageContentTagEventListener(e, currentMessageDiv)
             });
             subjectInput.addEventListener("keydown", (e) => {
-                addNewContentDiv(e, currentContentDiv);
+                addNewContentDiv(e, currentMessageDiv);
             })
-            prevContentCountArray.push(0);
+            prevContentCountMessageDivArray.push(0);
+            prevCompanyNameCountMessageDivArray.push(0);
         }
     }
 
@@ -494,7 +611,7 @@ export default function Dashboard() {
         })
         
         subjectInput!.addEventListener("input", (event) => {
-            companyNametagEventListener(event, 1)
+            subjectTagEventListener(event, 1)
         })
 
         contentInput!.addEventListener("keydown", (event) => {
@@ -502,7 +619,7 @@ export default function Dashboard() {
         })
 
         contentInput!.addEventListener("input", (event) => {
-            generatedTextNameTagEventListener(event, 1);
+            messageContentTagEventListener(event, 1)
         })
     }, [])
 
