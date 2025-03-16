@@ -11,7 +11,7 @@ declare global {
     }
 }
 
-export default function signin() {
+export default function Signin() {
 
     interface googleRespPayload {
         clientId: string, 
