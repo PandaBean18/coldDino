@@ -89,18 +89,36 @@ export default function Dashboard() {
     }
 
     function getCountCharactersBefore(d: HTMLElement) {
+        // const selection = window.getSelection();
+        // if (selection!.rangeCount === 0) {
+        //     return 0;
+        // }
+
+        // const range = selection!.getRangeAt(0);
+        // const preCursorRange = range.cloneRange();
+        // preCursorRange.selectNodeContents(d); 
+        // preCursorRange.setEnd(range.startContainer, range.startOffset); 
+
+        // let l = preCursorRange.toString().length;
+        // return l;
+        // const range = selection!.getRangeAt(0);
+        // const clonedRange = range.cloneRange();
+        // clonedRange.collapse(true); // Collapse to the start of the range
+
+        // const startRange = document.createRange();
+        // startRange.setStart(d, 0); // Start from the beginning of the <p> tag
+        // startRange.setEnd(clonedRange.startContainer, clonedRange.startOffset);
+
+        // const textToLeft = startRange.toString();
+        // return textToLeft.length;
         const selection = window.getSelection();
-        if (selection!.rangeCount === 0) {
-            return 0;
-        }
-
         const range = selection!.getRangeAt(0);
-        const preCursorRange = range.cloneRange();
-        preCursorRange.selectNodeContents(d); 
-        preCursorRange.setEnd(range.startContainer, range.startOffset); 
+        const clonedRange = range.cloneRange();
+        clonedRange.selectNodeContents(d);
+        clonedRange.setEnd(range.endContainer, range.endOffset);
 
-        let l = preCursorRange.toString().length;
-        return l;
+        const cursorPosition = clonedRange.toString().length;
+        return cursorPosition;
     }
 
     let currentSubjectDiv = 1;
@@ -112,6 +130,16 @@ export default function Dashboard() {
         console.log(divNo);
         if (event.key === "Enter") {
             event.preventDefault();
+            const selection = window.getSelection();
+            const range = selection!.getRangeAt(0);
+            // const rangeDup = range.cloneRange();
+            console.log(range.extractContents().textContent)
+            //rangeDup.setStart(range.startContainer, range.startOffset); 
+            // rangeDup.setEndAfter(range.endContainer.lastChild! || range.endContainer);
+            // selection!.removeAllRanges();
+            // selection!.addRange(rangeDup);
+            console.log(range.toString().length)
+
             const d = document.getElementById("newTemplateSubject");
             const newDiv = document.createElement("div");
             newDiv.id = `newTemplateSubjectDiv${currentSubjectDiv+1}`;
@@ -120,8 +148,8 @@ export default function Dashboard() {
             newDiv.contentEditable = "true";
             newDiv.onclick = () => {
                 currentSubjectDiv = divNo+1;
-
             }
+
             d!.appendChild(newDiv);
             subjectInput = newDiv;
             subjectInput.focus();
@@ -602,26 +630,183 @@ export default function Dashboard() {
         }
     }
 
-    useEffect(() => {
-        let subjectInput = document.getElementById("newTemplateSubjectDiv1");
-        let contentInput = document.getElementById("newTemplateContentDiv1");
+    function createCompanyNameSpan() {
+        const e = document.createElement("span");
+        e.innerText = "@companyName"
+        e.className += "w-min text-cyan-700 select-text";
+        e.contentEditable = "false";
+        return e;
+    }
 
-        subjectInput!.addEventListener("keydown", (event) => {
-            addNewSubjectDiv(event, 1);
-        })
+    function createGeneratedTextNameSpan() {
+        const e = document.createElement("span");
+        e.innerText = "@generatedText"
+        e.className += "w-min text-green-700 select-text";
+        e.contentEditable = "false";
+        return e;
+    }
+
+
+    function subjectKeyListener(event: KeyboardEvent) {
+        if (event.key === "Enter") {
+            //setTimeout(() => {}, 0)
+            event.preventDefault();
+            const selection = window.getSelection();
+            const subjectDiv = document.getElementById("newTemplateSubjectContent");
+            const charCount = getCountCharactersBefore(subjectDiv!);
+            
+            if (subjectDiv!.innerText[charCount-1] === "\n") {
+                subjectDiv!.innerHTML += "\n"
+            } else  {
+                subjectDiv!.innerHTML += "\n\n"
+            }
+            
+            selection!.removeAllRanges();
+            selection!.selectAllChildren(subjectDiv!);
+            selection!.collapseToStart();
+            for(let a = 0; a <= (charCount+1); a++) {
+                selection!.modify("move", "right", "character")
+            }
+        }
+    }
+
+    function subjectTagListener(event: Event) {
+        const subjectDiv = document.getElementById("newTemplateSubjectContent");
+        const charCount = getCountCharactersBefore(subjectDiv!);
+        const text = subjectDiv!.innerText;
+        let lastAppended = false;
+
+        let i = 0;
+        subjectDiv!.innerHTML = "";
+        for(i; i <= (text!.length - "@companyName".length); i++) {
+            if (text.slice(i, i+"@companyName".length) === "@companyName"){
+                const e = createCompanyNameSpan();
+                subjectDiv!.appendChild(e);
+
+                if (i === (text!.length - "@companyName".length)) {
+                    lastAppended = true;
+                    i += "@companyName".length;
+                } else {
+                    i += "@companyName".length - 1; 
+                }
+            } else if ((text!.length - i) >= ("@generatedText".length) && text.slice(i, i+("@generatedText".length)) === "@generatedText") {
+                const e = createGeneratedTextNameSpan();
+                subjectDiv!.appendChild(e);
+
+                if (i === (text!.length - "@generatedText".length)) {
+                    lastAppended = true;
+                    i += "@generatedText".length;
+                } else {
+                    i += "@generatedText".length - 1; 
+                }
+            } else {
+                subjectDiv!.innerHTML += text![i];
+            }
+        }
+
+        if (!lastAppended) {
+            subjectDiv!.innerHTML += text!.slice(i);
+        }
+
+        const selection = window.getSelection();
+        selection!.removeAllRanges();
+        selection!.selectAllChildren(subjectDiv!);
+        selection!.collapseToStart();
+        for(let a = 0; a < (charCount); a++) {
+            selection!.modify("move", "right", "character")
+        }
+    }
+
+    function messageKeyListener(event: KeyboardEvent) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            const selection = window.getSelection();
+            const subjectDiv = document.getElementById("newTemplateMessageContent");
+            const charCount = getCountCharactersBefore(subjectDiv!);
+
+            if (subjectDiv!.innerText[charCount-1] === "\n") {
+                subjectDiv!.innerHTML += "\n"
+            } else  {
+                subjectDiv!.innerHTML += "\n\n"
+            }
+
+            selection!.removeAllRanges();
+            selection!.selectAllChildren(subjectDiv!);
+            selection!.collapseToStart();
+            for(let a = 0; a <= (charCount+1); a++) {
+                selection!.modify("move", "right", "character")
+            }
+        }
+    }
+
+    function messageTagListener(event: Event) {
+        const subjectDiv = document.getElementById("newTemplateMessageContent");
+        const charCount = getCountCharactersBefore(subjectDiv!);
+        const text = subjectDiv!.innerText;
+        let lastAppended = false;
+
+        let i = 0;
+        subjectDiv!.innerHTML = "";
+        for(i; i <= (text!.length - "@companyName".length); i++) {
+            if (text.slice(i, i+"@companyName".length) === "@companyName"){
+                const e = createCompanyNameSpan();
+                subjectDiv!.appendChild(e);
+
+                if (i === (text!.length - "@companyName".length)) {
+                    lastAppended = true;
+                    i += "@companyName".length;
+                } else {
+                    i += "@companyName".length - 1; 
+                }
+            } else if ((text!.length - i) >= ("@generatedText".length) && text.slice(i, i+("@generatedText".length)) === "@generatedText") {
+                const e = createGeneratedTextNameSpan();
+                subjectDiv!.appendChild(e);
+
+                if (i === (text!.length - "@generatedText".length)) {
+                    lastAppended = true;
+                    i += "@generatedText".length;
+                } else {
+                    i += "@generatedText".length - 1; 
+                }
+            } else {
+                subjectDiv!.innerHTML += text![i];
+            }
+        }
+
+        if (!lastAppended) {
+            subjectDiv!.innerHTML += text!.slice(i);
+        }
+
+        const selection = window.getSelection();
+        selection!.removeAllRanges();
+        selection!.selectAllChildren(subjectDiv!);
+        selection!.collapseToStart();
+        for(let a = 0; a < (charCount); a++) {
+            selection!.modify("move", "right", "character")
+        }
+    }
+
+    // useEffect(() => {
+    //     let subjectInput = document.getElementById("newTemplateSubjectDiv1");
+    //     let contentInput = document.getElementById("newTemplateContentDiv1");
+
+    //     subjectInput!.addEventListener("keydown", (event) => {
+    //         addNewSubjectDiv(event, 1);
+    //     })
         
-        subjectInput!.addEventListener("input", (event) => {
-            subjectTagEventListener(event, 1)
-        })
+    //     subjectInput!.addEventListener("input", (event) => {
+    //         subjectTagEventListener(event, 1)
+    //     })
 
-        contentInput!.addEventListener("keydown", (event) => {
-            addNewContentDiv(event, 1);
-        })
+    //     contentInput!.addEventListener("keydown", (event) => {
+    //         addNewContentDiv(event, 1);
+    //     })
 
-        contentInput!.addEventListener("input", (event) => {
-            messageContentTagEventListener(event, 1)
-        })
-    }, [])
+    //     contentInput!.addEventListener("input", (event) => {
+    //         messageContentTagEventListener(event, 1)
+    //     })
+    // }, [])
+
 
     return  (
         <div className="w-full h-full bg-white select-none">
@@ -739,27 +924,47 @@ export default function Dashboard() {
                                 <p className="text-zinc-400">Fill in the details below to create a new template.</p>
                                 <br />
                                 <p className="text-[#121212] text-sm mb-[10px]">Subject line</p>
-                                <div id="newTemplateSubject" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap" contentEditable="false" onClick={() => {
+                                <div id="newTemplateSubject" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap hover:cursor-text" contentEditable="false" onClick={() => {
                                     
                                     if (!subjectActive) {
-                                        const d = document.getElementById("newTemplateSubjectDiv1")
-                                        d!.innerText = ""
-                                        d!.style.color = "#121212";
+                                        const d = document.getElementById("newTemplateSubject")
+                                        d!.innerText = "";
+                                        d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateSubjectContent"></p>`
+                                        const e = document.getElementById("newTemplateSubjectContent") 
+                                        e!.focus();
+                                        e!.addEventListener("input", (event) => {
+                                            subjectTagListener(event);
+                                        })
+
+                                        e!.addEventListener("keydown", (event) => {
+                                            subjectKeyListener(event);
+                                        })
+                                        e!.style.color = "#121212";
                                         subjectActive = true;
                                     }
 
-                                }}><div id="newTemplateSubjectDiv1" className="w-max max-w-full flex items-center focus:outline-none" contentEditable="true">Enter the subject of your email</div></div>
+                                }}>Enter the subject of your email</div>
                                 <br />
                                 <p className="text-[#121212] text-sm mb-[10px]">Message Content</p>
-                                <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 rounded-[2.5px] p-[10px] focus:outline-offset-5 focus:outline-zinc-400" id="newTemplateContent" contentEditable="false" onClick={() => {
+                                <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 hover:cursor-text" id="newTemplateContent" contentEditable="false" onClick={() => {
                                     if (!contentActive) {
-                                        const d = document.getElementById("newTemplateContentDiv1");
+                                        const d = document.getElementById("newTemplateContent")
                                         d!.innerText = "";
-                                        d!.style.color = "#121212";
+                                        d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateMessageContent"></p>`
+                                        const e = document.getElementById("newTemplateMessageContent") 
+                                        e!.focus();
+                                        e!.addEventListener("input", (event) => {
+                                            messageTagListener(event);
+                                        })
+
+                                        e!.addEventListener("keydown", (event) => {
+                                            messageKeyListener(event);
+                                        })
+                                        e!.style.color = "#121212";
                                         contentActive = true;
                                     }
                                     
-                                }}><div id="newTemplateContentDiv1" className="w-max max-w-full flex items-center focus:outline-none" contentEditable="true">Enter the content of your email</div></div>
+                                }}>Enter the content of your email</div>
                                 <br />
                                 <br />
                                 <div className="w-full flex justify-end items-center">
