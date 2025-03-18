@@ -150,14 +150,14 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="w-full h-[calc(100vh-50px)] mbp:h-[calc(100vh-75px)] bg-[#121212] mbp:flex mbp:pt-0 mbp:pb-0 pt-[40px] pb-[40px]">
+      <div className="w-full h-[calc(100vh-50px)] mbp:h-[calc(100vh-75px)] bg-black mbp:flex mbp:pt-0 mbp:pb-0 pt-[40px] pb-[40px]">
         <div className="w-full mbp:h-full flex flex-col justify-around mbp:w-[calc(100vw*0.5)]">
           <div className="topText w-full flex flex-col items-center">
-            <div className="text-3xl font-semibold mbp:text-4xl">
-              <p>Use AI To <span className="bg-linear-to-r from-cyan-500 to-green-500 bg-clip-text text-transparent">Personalize</span></p>
-              <p>Your Cold Emails To</p>
-              <p><span id="slots" className="bg-linear-to-r from-green-500 to-cyan-500 bg-clip-text text-transparent">{currentValue}</span></p>
-              <p className="text-[#121212] select-none">tastyBakedCookies.com</p>
+            <div className="text-3xl font-[300] mbp:text-4xl">
+              <p style={{fontFamily: "Poppins"}}>Use AI To <span className="bg-linear-to-r from-cyan-500 to-green-500 bg-clip-text text-transparent">Personalize</span></p>
+              <p style={{fontFamily: "Poppins"}}>Your Cold Emails To</p>
+              <p style={{fontFamily: "Poppins"}}><span id="slots" className="bg-linear-to-r from-green-500 to-cyan-500 bg-clip-text text-transparent">{currentValue}</span></p>
+              <p className="text-transparent select-none font-[300]" style={{fontFamily: "Poppins"}}>tastyBakedCookies.comm</p>
             </div>
           </div>
         </div>
@@ -223,56 +223,55 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="bg-white w-full">
-        <div className="w-full h-max flex p-[10px] pt-[50px] pb-0">
-          <div className="w-[60px] mbp:w-[30%] flex flex-col justify-center items-center grow-1">
-            <div className="bg-[#121212] w-[50px] h-[50px] flex justify-center items-center rounded-[50%] border-zinc-300 border-1"><p className="text-white text-3xl">1</p></div>
-            <div className="h-[calc(100%-40px)] w-[1px] border-zinc-300 border-r-1 border-l-1"></div>
-          </div>
-          <div className="w-[calc(100%-50px)] flex justify-center items-center">
-            <div className="w-full mbp:w-[60%]">
-              <p className="text-black text-xl mbp:text-2xl">Firstly start by creating an email template. This template is what will be sent to your cold contact and the AI generated content will be embeded into this.</p>
-              <br />
+      <div className="bg-black w-full h-full flex justify-center items-center">
+        <div className="h-[calc(100%-100px)] w-[calc(100%-100px)] flex flex-col justify-between">
+          <div className="w-[100%] h-[calc(50%-12.5px)] flex justify-between">
+            <div className="w-[calc(33%-12.5px)] h-full bg-white flex">
+              <div className="w-[25%] h-full">
+                <div className="w-full aspect-square bg-black rounded-br-[100%] flex justify-center items-center pr-[20px] pb-[20px]">
+                  <p className="text-5xl font-bold" style={{fontFamily: "Bebas Neue"}}>1</p>
+                </div>
+              </div>
+              <div className="w-[75%] flex flex-col justify-around items-around pr-[10px]">
+                <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>Firstly, start by creating an email template. This is the email that will be sent to your cold contacts.</p>
+              </div>
+            </div>
+            <div className="w-[calc(67%-12.5px)] h-full bg-white flex">
+              <div className="w-[75%] flex flex-col justify-around items-around pl-[10px]">
+                <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>After this, just move to our generate content tab, and type in the email of the person you wish to contact. Make sure to keep their email ID in the user@domainName.com format.</p>
+              </div>
+              <div className="w-[25%] h-full">
+                <div className="w-full max-h-[50%] aspect-square bg-black rounded-bl-[100%] flex justify-center items-center pl-[20px] pb-[20px]">
+                  <p className="text-5xl font-bold" style={{fontFamily: "Bebas Neue"}}>2</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="w-full h-max flex p-[10px] pt-0 pb-0">
-          <div className="w-[60px] mbp:w-[30%] flex flex-col justify-center items-center grow-1">
-            <div className="bg-[#121212] w-[50px] h-[50px] flex justify-center items-center rounded-[50%] border-zinc-300 border-1"><p className="text-white text-3xl">2</p></div>
-            <div className="h-[calc(100%-40px)] w-[1px] border-zinc-300 border-r-1 border-l-1"></div>
-          </div>
-          <div className="w-[calc(100%-50px)] flex justify-center items-center">
-            <div className="w-full mbp:w-[60%]">
-              <p className="text-black text-xl mbp:text-2xl">Then, upload the email id of the representative of the company that you wish to contact. Make sure that the mail that you upload is in the format of name@domainName.com!</p>
-              <br />
+          <div className="w-[100%] h-[calc(50%-12.5px)] flex justify-between">
+            <div className="w-[calc(67%-12.5px)] h-full bg-white flex">
+              <div className="w-[25%] h-full relative">
+                <div className="w-full max-h-[50%] aspect-square bg-black rounded-tr-[100%] flex justify-center items-center pr-[20px] pt-[20px] absolute bottom-0">
+                  <p className="text-5xl font-bold" style={{fontFamily: "Bebas Neue"}}>3</p>
+                </div>
+              </div>
+              <div className="w-[75%] flex flex-col justify-around items-around pr-[10px]">
+                <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>Now sit back and let our AI agent figure out what the company does and prepare a brief summary that looks just like you wrote it! Once done searching, the application will paste this into your email template, and the email will be ready to be sent.</p>
+              </div>
             </div>
-          </div>
-        </div>
-        <div className="w-full h-max flex p-[10px] pt-0 pb-0">
-          <div className="w-[60px] mbp:w-[30%] flex flex-col justify-center items-center grow-1">
-            <div className="bg-[#121212] w-[50px] h-[50px] flex justify-center items-center rounded-[50%] border-zinc-300 border-1"><p className="text-white text-3xl">3</p></div>
-            <div className="h-[calc(100%-40px)] w-[1px] border-zinc-300 border-r-1 border-l-1"></div>
-          </div>
-          <div className="w-[calc(100%-50px)] flex justify-center items-center">
-            <div className="w-full mbp:w-[60%]">
-              <p className="text-black text-xl mbp:text-2xl">Now sit back and let our AI agent figure out what the company does and prepare a brief summary that looks just like you wrote it! Once done searching, the application will paste this into your email template, and the email will be ready to be sent.</p>
-              <br />
-            </div>
-          </div>
-        </div>
-        <div className="w-full h-max flex p-[10px] pt-0 pb-0">
-          <div className="w-[60px] mbp:w-[30%] flex flex-col items-center grow-1">
-            <div className="bg-[#121212] w-[50px] h-[50px] flex justify-center items-center rounded-[50%] border-zinc-300 border-1"><p className="text-white text-3xl">4</p></div>
-          </div>
-          <div className="w-[calc(100%-50px)] flex justify-center items-center">
-            <div className="w-full mbp:w-[60%]">
-              <p className="text-black text-xl mbp:text-2xl">Once done, you can proof read the email and send it directly from our app, or save it to your drafts and send it later from your mailbox.</p>
-              <br />
+            <div className="w-[calc(33%-12.5px)] h-full bg-white flex">
+              <div className="w-[75%] flex flex-col justify-around items-around pl-[10px]">
+                <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>Once done, you can proof read the email and send it directly from our app, or save it to your drafts and send it later from your mailbox.</p>
+              </div>
+              <div className="w-[25%] h-full relative">
+                <div className="w-full max-h-[50%] aspect-square bg-black rounded-tl-[100%] flex justify-center items-center pl-[20px] pt-[20px] absolute bottom-0">
+                  <p className="text-5xl font-bold" style={{fontFamily: "Bebas Neue"}}>4</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div className="w-full lg:h-[300px] bg-zinc-300 pt-[30px] flex justify-around items-center">
+      {/* <div className="w-full lg:h-[300px] bg-zinc-300 pt-[30px] flex justify-around items-center">
         <div className="h-full w-[95%] flex items-center justify-between flex-col lg:flex-row">
           <div className="w-full lg:w-[30%] lg:h-[90%] flex flex-col items-center">
             <p className="text-black text-2xl text-center font-bold">Automate Email Personalization</p>
@@ -291,6 +290,31 @@ export default function Home() {
             <br />
             <p className="text-[#121212] text-xl text-left">Instead of sending the emails one at a time, you can upload a CSV file containing upto 20 emails of contacts that you wish to send cold emails to. The app will automatically parse them! (Coming soon)</p>
           </div>  
+        </div>
+      </div> */}
+
+      <div className="h-full w-full flex">
+        <div className="w-[30%] h-full bg-white flex flex-col justify-center items-center">
+          <p className="text-[#121212] text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>WHAT</p>
+          <p className="text-[#121212] text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>DO WE</p>
+          <p className="text-[#121212] text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>OFFER?</p>
+        </div>
+        <div className="w-[70%] h-full">
+          <div className="h-[33%] w-full bg-black p-[30px] flex flex-col justify-center">
+            <p className="text-white text-3xl font-bold" style={{fontFamily: "Bebas Neue"}}>Automated Email Personalization</p>
+            <br />
+            <p className="text-white text-xl" style={{fontFamily: "Poppins"}}>Even though you may know what the company does, it might be hard for you to put into perspective why you want to be working with them, and while cold mailing multiple companies, its easy to loose track.</p>
+          </div>  
+          <div className="h-[33%] w-full bg-white p-[30px] flex flex-col justify-center border-l-1">
+            <p className="text-[#121212] text-3xl font-bold" style={{fontFamily: "Bebas Neue"}}>Sending emails straight from the site</p>
+            <br />
+            <p className="text-[#121212] text-xl" style={{fontFamily: "Poppins"}}>You can send the emails after they have been generated straight from this site. No need to copy the message and send it from your mailbox, or you can save it in your drafts.</p>
+          </div>
+          <div className="h-[33%] w-full bg-black p-[30px] flex flex-col justify-center">
+            <p className="text-white text-3xl font-bold" style={{fontFamily: "Bebas Neue"}}>Send emails in batches</p>
+            <br />
+            <p className="text-white text-xl" style={{fontFamily: "Poppins"}}>Instead of sending the emails one at a time, you can upload a CSV file containing upto 20 emails of contacts that you wish to send cold emails to. The app will automatically parse them.</p>
+          </div>
         </div>
       </div>
     </div>
