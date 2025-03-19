@@ -254,7 +254,7 @@ export default function Dashboard() {
     }
 
     return  (
-        <div className="w-full h-full bg-white select-none">
+        <div className="w-full h-full bg-white select-none" style={{fontFamily: "Poppins"}}>
             <div className="bg-zinc-300 h-[70px] w-full mbp:h-0 relative flex justify-center items-center">
                 <Image 
                     src="/logo.svg"
@@ -362,60 +362,125 @@ export default function Dashboard() {
                 <div className="h-0 w-0 mbp:h-full mbp:w-[70%] mbp:min-w-[calc(100%-350px)] mbp:p-[20px] mbp:pb-0 flex flex-col justify-center items-center">
                     <div className="w-full h-[70px] border-zinc-300 border-0 border-b-1 flex items-center"><p className="text-3xl text-[#121212] font-semibold">Create New Template</p></div>
                     {/* <input className="h-[70px] w-full text-3xl text-[#121212] font-semibold border-zinc-200 border-0 border-b-1 focus:outline-none focus:border-zinc-500" type="text" id="newTemplateName" value={`Template ${totalTemplateCount+1}`}/> */}
-                    <div className="h-[calc(100%-70px)] w-[80%] pt-[20px] overflow-y-scroll flex justify-center items-center">
-                        <div className=" rounded-[5px] border-1 border-zinc-300 p-[10px] w-[500px]">
-                            <form onSubmit={createNewTemplate}>
-                                <input className="h-[50px] w-full text-3xl text-[#121212] font-semibold focus:outline-none" type="text" id="newTemplateName" value={newTemplateName} onChange={(e)=>{setNewTemplateName(e.target.value)}}/>
-                                <p className="text-zinc-400">Fill in the details below to create a new template.</p>
-                                <br />
-                                <p className="text-[#121212] text-sm mb-[10px]">Subject line</p>
-                                <div id="newTemplateSubject" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap hover:cursor-text" contentEditable="false" onClick={() => {
+                    <div className="flex h-full w-full">
+                        <div className="h-[calc(100%-40px)] pt-[20px] flex justify-center items-center">
+                            <div className="h-[50px] w-[70px] pr-[20px]">
+                                <Image 
+                                    src="/down.svg"
+                                    height={50}
+                                    width={50}
+                                    alt="up"
+                                    className="transform-[rotate(180deg)] hover:cursor-pointer"
+                                />
+                            </div>
+                            <div className="flex flex-col justify-center items-center">
+                                <div className="rounded-[5px] border-1 border-zinc-300 p-[10px] w-[500px] flex flex-col flex-center items-center">
+                                    <form className="w-full" onSubmit={createNewTemplate}>
+                                        <input className="h-[50px] w-full text-3xl text-[#121212] font-semibold focus:outline-none" type="text" id="newTemplateName" value={newTemplateName} onChange={(e)=>{setNewTemplateName(e.target.value)}}/>
+                                        <p className="text-zinc-400">Fill in the details below to create a new template.</p>
+                                        <br />
+                                        <div className="flex items-center h-[20px] mb-[5px]">
+                                            <p className="text-[#121212] text-sm mr-[10px]">Subject line</p>
+                                            <Image
+                                                src="/copy.svg"
+                                                height={20}
+                                                width={20}
+                                                alt="copy"
+                                            />
+                                        </div>
+                                        <div id="newTemplateSubject" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap hover:cursor-text" contentEditable="false" onClick={() => {
+                                            
+                                            if (!subjectActive) {
+                                                const d = document.getElementById("newTemplateSubject")
+                                                d!.innerText = "";
+                                                d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateSubjectContent"></p>`
+                                                const e = document.getElementById("newTemplateSubjectContent") 
+                                                e!.focus();
+                                                e!.addEventListener("input", (event) => {
+                                                    subjectTagListener(event);
+                                                })
+
+                                                e!.addEventListener("keydown", (event) => {
+                                                    subjectKeyListener(event);
+                                                })
+                                                e!.style.color = "#121212";
+                                                subjectActive = true;
+                                            }
+
+                                        }}>Enter the subject of your email</div>
+                                        <br />
+                                        <div className="flex items-center h-[20px] mb-[5px]">
+                                            <p className="text-[#121212] text-sm mr-[10px]">Message Content</p>
+                                            <Image
+                                                src="/copy.svg"
+                                                height={20}
+                                                width={20}
+                                                alt="copy"
+                                            />
+                                        </div>
+                                        <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 overflow-y-scroll rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 hover:cursor-text" id="newTemplateContent" contentEditable="false" onClick={() => {
+                                            if (!contentActive) {
+                                                const d = document.getElementById("newTemplateContent")
+                                                d!.innerText = "";
+                                                d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateMessageContent"></p>`
+                                                const e = document.getElementById("newTemplateMessageContent") 
+                                                e!.focus();
+                                                e!.addEventListener("input", (event) => {
+                                                    messageTagListener(event);
+                                                })
+
+                                                e!.addEventListener("keydown", (event) => {
+                                                    messageKeyListener(event);
+                                                })
+                                                e!.style.color = "#121212";
+                                                contentActive = true;
+                                            }
+                                            
+                                        }}>Enter the content of your email</div>
+                                        <br />
+                                        <br />
+                                        <div className="w-full flex justify-between items-center">
+                                            <div className="flex w-[100px] justify-between items-center">
+                                                <div className="h-[50px] w-[50px] flex justify-center items-center hover:cursor-pointer">
+                                                    <Image
+                                                        src="/link.svg"
+                                                        height={30}
+                                                        width={30}
+                                                        alt="link"
+                                                    />
+                                                </div>
+                                                <div className="h-[50px] w-[50px] flex justify-center items-center hover:cursor-pointer">
+                                                    <Image
+                                                        src="/attachment.svg"
+                                                        height={30}
+                                                        width={30}
+                                                        alt="attachment"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <input className=" bg-[#121212] p-[10px] rounded-[10px] hover:cursor-pointer self-end" type="submit" value="Create new template"/>
+                                        </div>
+                                    </form>
                                     
-                                    if (!subjectActive) {
-                                        const d = document.getElementById("newTemplateSubject")
-                                        d!.innerText = "";
-                                        d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateSubjectContent"></p>`
-                                        const e = document.getElementById("newTemplateSubjectContent") 
-                                        e!.focus();
-                                        e!.addEventListener("input", (event) => {
-                                            subjectTagListener(event);
-                                        })
-
-                                        e!.addEventListener("keydown", (event) => {
-                                            subjectKeyListener(event);
-                                        })
-                                        e!.style.color = "#121212";
-                                        subjectActive = true;
-                                    }
-
-                                }}>Enter the subject of your email</div>
-                                <br />
-                                <p className="text-[#121212] text-sm mb-[10px]">Message Content</p>
-                                <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 hover:cursor-text" id="newTemplateContent" contentEditable="false" onClick={() => {
-                                    if (!contentActive) {
-                                        const d = document.getElementById("newTemplateContent")
-                                        d!.innerText = "";
-                                        d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateMessageContent"></p>`
-                                        const e = document.getElementById("newTemplateMessageContent") 
-                                        e!.focus();
-                                        e!.addEventListener("input", (event) => {
-                                            messageTagListener(event);
-                                        })
-
-                                        e!.addEventListener("keydown", (event) => {
-                                            messageKeyListener(event);
-                                        })
-                                        e!.style.color = "#121212";
-                                        contentActive = true;
-                                    }
-                                    
-                                }}>Enter the content of your email</div>
-                                <br />
-                                <br />
-                                <div className="w-full flex justify-end items-center">
-                                    <input className=" bg-[#121212] p-[10px] rounded-[10px] hover:cursor-pointer self-end" type="submit" value="Create new template"/>
                                 </div>
-                            </form>
+                                <p className="text-[#121212] text-xl" style={{fontFamily: "Bebas Neue"}}>1/3</p>
+                            </div>
+                            <div className="h-[50px] w-[70px] pl-[20px]">
+                                <Image
+                                    src="/down.svg"
+                                    height={50}
+                                    width={50}
+                                    alt="down"
+                                    className="hover:cursor-pointer"
+                                />
+                            </div>
+                        </div>
+                        <div className="w-max h-full hidden mbp:flex justify-center p-[10px] pl-[20px]">
+                            <ul className="list-disc text-[#121212]">
+                                <li><p className="text-xl">Use the <span className="text-cyan-700">@companyName</span> placeholder to refer to the company name.</p></li>
+                                <br />
+                                <li><p className="text-xl">Use the <span className="text-green-700">@generatedText</span> placeholder to refer to the text that will be generated by our AI agent.</p></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
