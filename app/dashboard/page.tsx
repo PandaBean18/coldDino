@@ -192,7 +192,8 @@ export default function Dashboard() {
 
     function messageTagListener(event: Event) {
         const subjectDiv = document.getElementById("newTemplateMessageContent");
-        const charCount = getCountCharactersBefore(subjectDiv!);
+        let charCount = getCountCharactersBefore(subjectDiv!);
+        const constantCharCount = charCount;
         const text = subjectDiv!.innerText;
         let lastAppended = false;
 
@@ -203,6 +204,14 @@ export default function Dashboard() {
                 const e = createCompanyNameSpan();
                 subjectDiv!.appendChild(e);
 
+                if (i < constantCharCount) {
+                    charCount -= "@companyName".length;
+                    if (i > 0 && text![i-1] !== "\n") {
+                        charCount += 1;
+                    }
+                    
+                }
+
                 if (i === (text!.length - "@companyName".length)) {
                     lastAppended = true;
                     i += "@companyName".length;
@@ -212,6 +221,13 @@ export default function Dashboard() {
             } else if ((text!.length - i) >= ("@generatedText".length) && text.slice(i, i+("@generatedText".length)) === "@generatedText") {
                 const e = createGeneratedTextNameSpan();
                 subjectDiv!.appendChild(e);
+
+                if (i < constantCharCount) {
+                    charCount -= "@generatedText".length;
+                    if (i > 0 && text![i-1] !== "\n") {
+                        charCount += 1;
+                    }
+                }
 
                 if (i === (text!.length - "@generatedText".length)) {
                     lastAppended = true;
