@@ -5,7 +5,9 @@ import { useState } from "react";
 
 declare global {
     interface HTMLElement {
-        src: string
+        src: string,
+        value: string,
+        href: string,
     }
 
     interface Event {
@@ -78,7 +80,29 @@ export default function Dashboard() {
         clonedRange.setEnd(range.endContainer, range.endOffset);
 
         const cursorPosition = clonedRange.toString().length;
+        console.log(clonedRange.toString())
         return cursorPosition;
+    }
+
+    function matchUrl(s: string) {
+        const expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
+        const regex = new RegExp(expression);
+
+        return (s.match(regex) !== null);
+    }
+
+    function createUrlAnchorTag(url: string, text: string | null = null) {
+        const e = document.createElement("a");
+        e.href = url;
+        e.className = "underline text-blue-500"
+
+        if (text === null) {
+            e.innerHTML = url;
+        } else {
+            e.innerHTML = text;
+        }
+
+        return e;
     }
 
     function createCompanyNameSpan() {
@@ -190,16 +214,48 @@ export default function Dashboard() {
         }
     }
 
-    function messageTagListener(event: Event) {
+    function messageTagListener() {
         const subjectDiv = document.getElementById("newTemplateMessageContent");
         let charCount = getCountCharactersBefore(subjectDiv!);
         const constantCharCount = charCount;
         const text = subjectDiv!.innerText;
         let lastAppended = false;
+        let lastWord = ""
+        let numCompanyNameTags = 0;
+        let numGeneratedTextTags = 0;
 
         let i = 0;
         subjectDiv!.innerHTML = "";
-        for(i; i <= (text!.length - "@companyName".length); i++) {
+        for(i; i < (text!.length); i++) {
+            if (text![i] === "\n" || text![i] === " ") {
+                if (matchUrl(lastWord)) {
+                    const t = text![i];
+                    const size = lastWord.length;
+                    const selection = document.getSelection();
+                    selection!.removeAllRanges();
+                    selection!.selectAllChildren(subjectDiv!);
+                    selection!.collapseToStart();
+                    
+                    for (let j = 0; j < (i - size - ((numCompanyNameTags) * ("@companyName".length - 1) + (numGeneratedTextTags * ("@generatedText".length - 1)))); j++) {
+                        selection!.modify("move", "right", "character");
+                    }
+
+                    for (let k = 0; k < size; k++) {
+                        selection!.modify("extend", "right", "character");
+                    }
+
+                    selection!.deleteFromDocument();
+                    const e = createUrlAnchorTag(lastWord);
+                    subjectDiv!.appendChild(e);
+                    lastWord = "";
+                    subjectDiv!.innerHTML += t
+                    continue
+                }
+                lastWord = "";
+            } else {
+                lastWord += text![i];
+            }
+
             if (text.slice(i, i+"@companyName".length) === "@companyName"){
                 const e = createCompanyNameSpan();
                 subjectDiv!.appendChild(e);
@@ -218,6 +274,8 @@ export default function Dashboard() {
                 } else {
                     i += "@companyName".length - 1; 
                 }
+
+                numCompanyNameTags += 1;
             } else if ((text!.length - i) >= ("@generatedText".length) && text.slice(i, i+("@generatedText".length)) === "@generatedText") {
                 const e = createGeneratedTextNameSpan();
                 subjectDiv!.appendChild(e);
@@ -235,6 +293,63 @@ export default function Dashboard() {
                 } else {
                     i += "@generatedText".length - 1; 
                 }
+
+                numGeneratedTextTags += 1;
+            } else if ((text!.length - i) >= "!!LINK!![]".length && text!.slice(i, i+("!!LINK!![".length)) === "!!LINK!![") {
+                let url = "";
+                let displayText = "";
+                let commasCrossed = 0;
+                let linkId = "";
+                let k;
+                for (k = i + "!!LINK!![".length; k < text!.length; k++) {
+                    if (text![k] === "]") {
+                        break;
+                    } else {
+                        if (text![k] === ",") {
+                            commasCrossed += 1;
+                        } else if (commasCrossed === 1) {
+                            displayText += text![k];
+                        } else if (commasCrossed === 0) {
+                            url += text![k];
+                        } else if (commasCrossed === 2) {
+                            linkId += text![k]
+                        }
+                    }
+                }
+
+                const ele = document.createElement("span");
+                ele.style.display = "inline-flex";
+                ele.style.width = "0";
+                ele.style.height = "0";
+                ele.style.overflow = "hidden";
+                ele.innerHTML = `!!LINK!![${url},${displayText},${linkCount}]`;
+                ele.contentEditable = "false";
+                subjectDiv!.appendChild(ele);
+
+                const e = createUrlAnchorTag(url, displayText)
+                e.id = linkId;
+                subjectDiv!.appendChild(e);
+
+                // this removes old event listeners;
+                var old_element = document.getElementById("addLinkDivGoToTextInput");
+                var new_element = old_element!.cloneNode(true);
+                old_element!.parentNode!.replaceChild(new_element, old_element!);
+
+                new_element.addEventListener("input", () => {
+                    addNewLinkEventListener(linkId);
+                })
+
+                if (i < charCount) {
+                    charCount -= `!!LINK!![${url},${displayText},${linkCount}]`.length;
+                    charCount += 1;
+                }
+
+                if (i === (text!.length - (`!!LINK!![${url},${displayText},${linkCount}]`.length + displayText.length))) {
+                    lastAppended = true;
+                    i += (`!!LINK!![${url},${displayText},${linkCount}]`.length + displayText.length);
+                } else {
+                    i += (`!!LINK!![${url},${displayText},${linkCount}]`.length + displayText.length) - 1; 
+                }
             } else {
                 subjectDiv!.innerHTML += text![i];
             }
@@ -251,6 +366,68 @@ export default function Dashboard() {
         for(let a = 0; a < (charCount); a++) {
             selection!.modify("move", "right", "character")
         }
+    }
+
+    function getSelectedText(): string | null {
+        const selection = window.getSelection();
+
+        if (selection!.rangeCount === 0) {
+            window.alert("Please select the text that you want to add link to.");
+            return null;
+        }
+
+        return selection!.toString();
+    }
+
+    let addLinkDivShowing = false;
+    let cursorPositionBeforeLink;
+    let linkCount = 0;
+
+    function addNewLinkEventListener(linkId: string) {
+        const e = document.getElementById(linkId);
+        const d = document.getElementById("addLinkDivGoToTextInput");
+        e!.href =  d!.value;
+    }
+
+    function toggleAddlink() {
+        const e = document.getElementById("addLinkDiv");
+        const messageDiv = document.getElementById("newTemplateMessageContent")
+        if (!addLinkDivShowing) {
+            e!.style.display = "flex";
+            addLinkDivShowing = true;
+            const displayText = getSelectedText();
+            if (displayText === null) {
+                e!.style.display = "";
+                addLinkDivShowing = false;
+            } else {
+                cursorPositionBeforeLink = getCountCharactersBefore(messageDiv!);
+                const d = document.getElementById("addLinkDivDisplayTextInput");
+                d!.value = displayText;
+
+                const messageContent = messageDiv!.innerText;
+                messageDiv!.innerHTML = ""
+                for (let i = 0; i < messageContent!.length; i++) {
+                    if (i === (cursorPositionBeforeLink - displayText.length)) {
+                        linkCount += 1;
+                        const ele = document.createElement("span");
+                        ele.style.display = "inline-flex";
+                        ele.style.width = "0";
+                        ele.style.height = "0";
+                        ele.style.overflow = "hidden";
+                        ele.contentEditable = "false";
+                        ele.innerHTML = `!!LINK!![${""},${displayText},${linkCount}]`;
+                        messageDiv!.appendChild(ele);
+                    }
+                    console.log(messageContent[i]);
+                    messageDiv!.innerHTML += messageContent[i];
+                }
+                messageTagListener()
+            }
+        } else {
+            e!.style.display = "";
+            addLinkDivShowing = false;
+        }
+        
     }
 
     return  (
@@ -426,7 +603,7 @@ export default function Dashboard() {
                                                 const e = document.getElementById("newTemplateMessageContent") 
                                                 e!.focus();
                                                 e!.addEventListener("input", (event) => {
-                                                    messageTagListener(event);
+                                                    messageTagListener();
                                                 })
 
                                                 e!.addEventListener("keydown", (event) => {
@@ -437,11 +614,17 @@ export default function Dashboard() {
                                             }
                                             
                                         }}>Enter the content of your email</div>
-                                        <br />
-                                        <br />
+                                        <div className="w-full h-[45px] p-[10px]">
+                                            <div className="hidden h-max w-full" id="addLinkDiv">
+                                                <div className="flex w-full justify-between">
+                                                    <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Display Text" id="addLinkDivDisplayTextInput" disabled />
+                                                    <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Go To Text" id="addLinkDivGoToTextInput"  />
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div className="w-full flex justify-between items-center">
                                             <div className="flex w-[100px] justify-between items-center">
-                                                <div className="h-[50px] w-[50px] flex justify-center items-center hover:cursor-pointer">
+                                                <div className="h-[50px] w-[50px] flex justify-center items-center hover:cursor-pointer" onClick={toggleAddlink}>
                                                     <Image
                                                         src="/link.svg"
                                                         height={30}
