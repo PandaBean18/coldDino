@@ -1,7 +1,9 @@
 'use client'
 import Image from "next/image"
-import { useEffect } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { useState } from "react";
+import Cookies from "js-cookie"
+
 
 declare global {
     interface HTMLElement {
@@ -12,7 +14,12 @@ declare global {
 
     interface Event {
         inputType: string,
-        data: string
+        data: string,
+        key: string
+    }
+
+    interface EventTarget {
+        value: string
     }
 }
 
@@ -68,8 +75,15 @@ export default function Dashboard() {
         }
     }
 
-    function createNewTemplate(): boolean {
-        return true;
+    function createNewTemplate(event: Event): boolean {
+        event.preventDefault();
+        const subjectDiv = document.getElementById("newTemplateSubjectContent");
+        const contentDiv = document.getElementById("newTemplateMessageContent");
+        console.log(subjectDiv!.innerText);
+        console.log(contentDiv!.innerText);
+        //window.location.href = "/"
+
+        return false;
     }
 
     function getCountCharactersBefore(d: HTMLElement) {
@@ -214,7 +228,7 @@ export default function Dashboard() {
         }
     }
 
-    function messageTagListener() {
+    function messageTagListener(urlToAdd: string | null = null) {
         const subjectDiv = document.getElementById("newTemplateMessageContent");
         let charCount = getCountCharactersBefore(subjectDiv!);
         const constantCharCount = charCount;
@@ -322,7 +336,7 @@ export default function Dashboard() {
                 ele.style.width = "0";
                 ele.style.height = "0";
                 ele.style.overflow = "hidden";
-                ele.innerHTML = `!!LINK!![${url},${displayText},${linkCount}]`;
+                ele.innerHTML = `!!LINK!![${((linkId === (linkCount.toString()) && (urlToAdd !== null) ? urlToAdd : url))},${displayText},${linkId}]`;
                 ele.contentEditable = "false";
                 subjectDiv!.appendChild(ele);
 
@@ -337,7 +351,7 @@ export default function Dashboard() {
 
                 new_element.addEventListener("input", () => {
                     addNewLinkEventListener(linkId);
-                })
+                });
 
                 if (i < charCount) {
                     charCount -= `!!LINK!![${url},${displayText},${linkCount}]`.length;
@@ -366,6 +380,7 @@ export default function Dashboard() {
         for(let a = 0; a < (charCount); a++) {
             selection!.modify("move", "right", "character")
         }
+        return 
     }
 
     function getSelectedText(): string | null {
@@ -387,6 +402,15 @@ export default function Dashboard() {
         const e = document.getElementById(linkId);
         const d = document.getElementById("addLinkDivGoToTextInput");
         e!.href =  d!.value;
+    }
+
+    function applyLink() {
+        const e = document.getElementById("addLinkDiv");
+        const gotoTextInput = document.getElementById("addLinkDivGoToTextInput");
+        const url = gotoTextInput!.value;
+        messageTagListener(url);
+        e!.style.display = "";
+        addLinkDivShowing = false;        
     }
 
     function toggleAddlink() {
@@ -429,6 +453,14 @@ export default function Dashboard() {
         }
         
     }
+
+    useEffect(()=>{
+        const form = document.getElementById("newTemplateForm");
+        form!.addEventListener("submit", (event)=>{
+            createNewTemplate(event);
+        })
+
+    }, [])
 
     return  (
         <div className="w-full h-full bg-white select-none" style={{fontFamily: "Poppins"}}>
@@ -552,7 +584,7 @@ export default function Dashboard() {
                             </div>
                             <div className="flex flex-col justify-center items-center">
                                 <div className="rounded-[5px] border-1 border-zinc-300 p-[10px] w-[500px] flex flex-col flex-center items-center">
-                                    <form className="w-full" onSubmit={createNewTemplate}>
+                                    <form className="w-full" id="newTemplateForm">
                                         <input className="h-[50px] w-full text-3xl text-[#121212] font-semibold focus:outline-none" type="text" id="newTemplateName" value={newTemplateName} onChange={(e)=>{setNewTemplateName(e.target.value)}}/>
                                         <p className="text-zinc-400">Fill in the details below to create a new template.</p>
                                         <br />
@@ -618,7 +650,8 @@ export default function Dashboard() {
                                             <div className="hidden h-max w-full" id="addLinkDiv">
                                                 <div className="flex w-full justify-between">
                                                     <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Display Text" id="addLinkDivDisplayTextInput" disabled />
-                                                    <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Go To Text" id="addLinkDivGoToTextInput"  />
+                                                    <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Go To Text" id="addLinkDivGoToTextInput" onChange={(event)=>{console.log(event)}} />
+                                                    <input className="bg-black text-white hover:cursor-pointer" type="button" value={"apply"} onClick={applyLink} />
                                                 </div>
                                             </div>
                                         </div>
