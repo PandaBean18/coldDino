@@ -78,9 +78,19 @@ export default function Dashboard() {
 
     function createNewTemplate(event: Event): boolean {
         event.preventDefault();
+        const templateName = document.getElementById("newTemplateName");
         const subjectDiv = document.getElementById("newTemplateSubjectContent");
         const contentDiv = document.getElementById("newTemplateMessageContent");
+        console.log(subjectDiv?.innerText);
+        console.log(contentDiv?.innerText);
+        const obj = {
+            templateName: templateName?.value || "",
+            subject: subjectDiv?.innerText || "",
+            message: contentDiv?.innerText || "", 
+        }
 
+        console.log(JSON.stringify(obj));
+        Cookies.set("template", `${JSON.stringify(obj)}`, {expires: 1000});
         //window.location.href = "/"
 
         return false;
@@ -487,7 +497,6 @@ export default function Dashboard() {
     let applyLinkDiv: HTMLElement;
 
     function toggleAddlink() {
-        const e = document.getElementById("addLinkDiv");
         const parentDiv = document.getElementById("newTemplateForm")
         const messageDiv = document.getElementById("newTemplateMessageContent")
         
@@ -496,18 +505,15 @@ export default function Dashboard() {
             applyLinkDiv = createApplyLinkDiv(calculatedX, calculatedY);
             linkCount += 1;
             parentDiv!.appendChild(applyLinkDiv)
-            // e!.style.display = "flex";
-            // addLinkDivShowing = true;
+            
             const displayText = getSelectedText();
             if (displayText === null) {
-                e!.style.display = "";
                 addLinkDivShowing = false;
             } else {
                 cursorPositionBeforeLink = getCountCharactersBefore(messageDiv!);
                 const d = document.getElementById("applyLinkDisplayText");
                 d!.value = displayText;
                 d!.disabled = "true";
-
                 const messageContent = messageDiv!.innerText;
                 messageDiv!.innerHTML = ""
                 for (let i = 0; i < messageContent!.length; i++) {
@@ -524,11 +530,11 @@ export default function Dashboard() {
                     }
                     messageDiv!.innerHTML += messageContent[i];
                 }
-                messageTagListener()
+                messageTagListener();
+                document.getElementById("applyLinkGoToText")!.focus();
             }
         } else {
             parentDiv!.removeChild(applyLinkDiv);
-            e!.style.display = "";
             addLinkDivShowing = false;
         }
         
@@ -727,13 +733,7 @@ export default function Dashboard() {
                                             
                                         }}>Enter the content of your email</div>
                                         <div className="w-full h-[45px] p-[10px]">
-                                            <div className="hidden h-max w-full" id="addLinkDiv">
-                                                <div className="flex w-full justify-between">
-                                                    <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Display Text" id="addLinkDivDisplayTextInput" disabled />
-                                                    <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Go To Text" id="addLinkDivGoToTextInput"/>
-                                                    <input className="bg-black text-white hover:cursor-pointer" type="button" value={"apply"} onClick={applyLink} />
-                                                </div>
-                                            </div>
+
                                         </div>
                                         <div className="w-full flex justify-between items-center">
                                             <div className="flex w-[100px] justify-between items-center">
