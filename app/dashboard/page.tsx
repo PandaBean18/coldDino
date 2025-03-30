@@ -10,6 +10,7 @@ declare global {
         src: string,
         value: string,
         href: string,
+        disabled: string,
     }
 
     interface Event {
@@ -79,8 +80,7 @@ export default function Dashboard() {
         event.preventDefault();
         const subjectDiv = document.getElementById("newTemplateSubjectContent");
         const contentDiv = document.getElementById("newTemplateMessageContent");
-        console.log(subjectDiv!.innerText);
-        console.log(contentDiv!.innerText);
+
         //window.location.href = "/"
 
         return false;
@@ -94,7 +94,6 @@ export default function Dashboard() {
         clonedRange.setEnd(range.endContainer, range.endOffset);
 
         const cursorPosition = clonedRange.toString().length;
-        console.log(clonedRange.toString())
         return cursorPosition;
     }
 
@@ -340,18 +339,9 @@ export default function Dashboard() {
                 ele.contentEditable = "false";
                 subjectDiv!.appendChild(ele);
 
-                const e = createUrlAnchorTag(url, displayText)
+                const e = createUrlAnchorTag(((linkId === (linkCount.toString()) && (urlToAdd !== null) ? urlToAdd : url)), displayText)
                 e.id = linkId;
                 subjectDiv!.appendChild(e);
-
-                // this removes old event listeners;
-                var old_element = document.getElementById("addLinkDivGoToTextInput");
-                var new_element = old_element!.cloneNode(true);
-                old_element!.parentNode!.replaceChild(new_element, old_element!);
-
-                new_element.addEventListener("input", () => {
-                    addNewLinkEventListener(linkId);
-                });
 
                 if (i < charCount) {
                     charCount -= `!!LINK!![${url},${displayText},${linkCount}]`.length;
@@ -400,39 +390,129 @@ export default function Dashboard() {
 
     function addNewLinkEventListener(linkId: string) {
         const e = document.getElementById(linkId);
-        const d = document.getElementById("addLinkDivGoToTextInput");
+        const d = document.getElementById("applyLinkGoToText");
         e!.href =  d!.value;
+
+        if (d!.value === "") {
+            const applyLinkButton = document.getElementById("applyLinkButton");
+            applyLinkButton!.style.backgroundColor = "#71717b";
+            applyLinkButton!.disabled = "true";
+        } else {
+            const applyLinkButton = document.getElementById("applyLinkButton");
+            applyLinkButton!.style.backgroundColor = "black";
+            applyLinkButton!.removeAttribute("disabled")
+        }
     }
 
     function applyLink() {
-        const e = document.getElementById("addLinkDiv");
-        const gotoTextInput = document.getElementById("addLinkDivGoToTextInput");
+        const gotoTextInput = document.getElementById("applyLinkGoToText");
         const url = gotoTextInput!.value;
+        console.log(url);
         messageTagListener(url);
-        e!.style.display = "";
-        addLinkDivShowing = false;        
+        const parentDiv = document.getElementById("newTemplateForm");
+        parentDiv!.removeChild(applyLinkDiv);
+        addLinkDivShowing = false;
     }
+
+    function calculateApplyLinkDivPos(divHeight: number = 200, divWidth : number = 200) {
+        const selection = window.getSelection();
+        const range = selection!.getRangeAt(0).cloneRange();
+        range.collapse(false);
+
+        const e = document.createElement("span");
+        range.insertNode(e);
+
+        const rect = e.getBoundingClientRect();
+
+        console.log("Left: ", rect.left);
+        console.log("Top: ", rect.top);
+        e.parentNode!.removeChild(e);
+
+        const d = document.getElementById("newTemplateMessageContent");
+        const controlRect = d!.getBoundingClientRect();
+        console.log("Control Left: ", controlRect.left);
+        console.log("Control Top: ", controlRect.top);
+
+        let x = rect.left + 10;
+        let y = rect.top + 25;
+
+        if ((y + divHeight) > (controlRect.top + 280)) {
+            y = controlRect.top + 280 - divHeight - 25;
+        }
+
+        if ((x + divWidth) > (controlRect.left + 450)) {
+            x = controlRect.left + 450 - divWidth - 10;
+        }
+        
+        return [x, y]
+    }
+
+    function createApplyLinkDiv(x: number, y: number) {
+        const e = document.createElement("div");
+        const inputEle1 = document.createElement("input");
+        inputEle1.type = "text";
+        inputEle1.id = "applyLinkDisplayText"
+        inputEle1.className = "border-1 border-zinc-300 h-[40px] w-[180px] p-[10px] rounded-[2.5px] focus:outline-1 text-zinc-500";
+        inputEle1.placeholder = "Display Text";
+
+        const inputEle2 = document.createElement("input");
+        inputEle2.type = "text";
+        inputEle2.className = "border-1 border-zinc-300 h-[40px] w-[180px] p-[10px] rounded-[2.5px] focus:outline-1 text-zinc-500";
+        inputEle2.placeholder = "Go To Link";
+        inputEle2.id = "applyLinkGoToText"
+
+        inputEle2.addEventListener("input", () => {
+            addNewLinkEventListener(linkCount.toString());
+        });
+
+
+        const inputButton = document.createElement("input");
+        inputButton.type = "button";
+        inputButton.className = "border-1 border-zinc-600 h-[40px] w-[80%] bg-zinc-500 text-white rounded-[2.5px] hover:cursor-pointer"
+        inputButton.value = "Apply Link"
+        inputButton.onclick = applyLink;
+        inputButton.id = "applyLinkButton";
+        inputButton.disabled = true;
+ 
+        const t = `absolute bg-white h-[200px] w-[200px] rounded-[5px] shadow-[0_4px_8px_0_rgba(0,0,0,0.2),0_6px_20px_0_rgba(0,0,0,0.19)] p-[10px] flex flex-col items-center justify-evenly`;
+        e.className = t;
+        e.style.top = `${y}px`;
+        e.style.left  = `${x}px`;
+        e.appendChild(inputEle1);
+        e.appendChild(inputEle2);
+        e.appendChild(inputButton);
+        return e;
+    }
+
+    let applyLinkDiv: HTMLElement;
 
     function toggleAddlink() {
         const e = document.getElementById("addLinkDiv");
+        const parentDiv = document.getElementById("newTemplateForm")
         const messageDiv = document.getElementById("newTemplateMessageContent")
+        
         if (!addLinkDivShowing) {
-            e!.style.display = "flex";
-            addLinkDivShowing = true;
+            const [calculatedX, calculatedY] = calculateApplyLinkDivPos();
+            applyLinkDiv = createApplyLinkDiv(calculatedX, calculatedY);
+            linkCount += 1;
+            parentDiv!.appendChild(applyLinkDiv)
+            // e!.style.display = "flex";
+            // addLinkDivShowing = true;
             const displayText = getSelectedText();
             if (displayText === null) {
                 e!.style.display = "";
                 addLinkDivShowing = false;
             } else {
                 cursorPositionBeforeLink = getCountCharactersBefore(messageDiv!);
-                const d = document.getElementById("addLinkDivDisplayTextInput");
+                const d = document.getElementById("applyLinkDisplayText");
                 d!.value = displayText;
+                d!.disabled = "true";
 
                 const messageContent = messageDiv!.innerText;
                 messageDiv!.innerHTML = ""
                 for (let i = 0; i < messageContent!.length; i++) {
                     if (i === (cursorPositionBeforeLink - displayText.length)) {
-                        linkCount += 1;
+                        
                         const ele = document.createElement("span");
                         ele.style.display = "inline-flex";
                         ele.style.width = "0";
@@ -442,12 +522,12 @@ export default function Dashboard() {
                         ele.innerHTML = `!!LINK!![${""},${displayText},${linkCount}]`;
                         messageDiv!.appendChild(ele);
                     }
-                    console.log(messageContent[i]);
                     messageDiv!.innerHTML += messageContent[i];
                 }
                 messageTagListener()
             }
         } else {
+            parentDiv!.removeChild(applyLinkDiv);
             e!.style.display = "";
             addLinkDivShowing = false;
         }
@@ -627,7 +707,7 @@ export default function Dashboard() {
                                                 alt="copy"
                                             />
                                         </div>
-                                        <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 overflow-y-scroll rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 hover:cursor-text" id="newTemplateContent" contentEditable="false" onClick={() => {
+                                        <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 overflow-y-scroll rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 hover:cursor-text relative" id="newTemplateContent" contentEditable="false" onClick={() => {
                                             if (!contentActive) {
                                                 const d = document.getElementById("newTemplateContent")
                                                 d!.innerText = "";
@@ -650,7 +730,7 @@ export default function Dashboard() {
                                             <div className="hidden h-max w-full" id="addLinkDiv">
                                                 <div className="flex w-full justify-between">
                                                     <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Display Text" id="addLinkDivDisplayTextInput" disabled />
-                                                    <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Go To Text" id="addLinkDivGoToTextInput" onChange={(event)=>{console.log(event)}} />
+                                                    <input className="text-[#121212] p-[2.5px] border-1" type="text" placeholder="Go To Text" id="addLinkDivGoToTextInput"/>
                                                     <input className="bg-black text-white hover:cursor-pointer" type="button" value={"apply"} onClick={applyLink} />
                                                 </div>
                                             </div>
