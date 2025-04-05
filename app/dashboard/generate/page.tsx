@@ -3,6 +3,7 @@ import React from "react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import axios from "axios";
 
 interface InvdividualTemplate {
     templateName: string, 
@@ -26,6 +27,9 @@ function desktopView() {
     let currentEmailInputTab = "manual";
     let currentTemplateIndex = -1;
     let templates: Array<InvdividualTemplate> = [];
+    let [companyDomains, setCompanyDomains] = useState(Array<string>);
+    let [currentCompanyIndex, setCurrentCompanyIndex] = useState(-1);
+    let [companyInfo, setCompanyInfo] = useState(Array<string>);
 
     function createUrlAnchorTag(url: string, text: string | null = null) {
         const e = document.createElement("a");
@@ -175,6 +179,109 @@ function desktopView() {
         }
     }
 
+    function handleBack() {
+        const inputDiv = document.getElementById("emailInputTab");
+        const companyInfoDiv = document.getElementById("checkSiteContentDiv");
+        setCompanyDomains([]);
+        resetCompanyInfoDiv();
+        inputDiv!.style.display = "block";
+        companyInfoDiv!.style.display = "none";
+    }
+
+    function generateMails() {
+        return true;
+    }
+
+    function validateMail(str: string) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str)
+    }
+
+    function handleNextStepClick() {
+        const mailsDiv = document.getElementById("emailInputManual");
+        const mailsDivContent = mailsDiv!.value;
+        const mails: Array<string> = mailsDivContent.trim().split("\n");
+        const currentCompanyDomains = [];
+
+        for(let i = 0; i < mails.length; i++) {
+            if (!validateMail(mails[i])) {
+                alert("Invalid mails detected.")
+                return false;
+            }
+            const currentDomain = mails[i].slice(mails[i].indexOf("@")+1);
+            currentCompanyDomains.push(currentDomain);
+        }
+
+        const inputDiv = document.getElementById("emailInputTab");
+        const companyInfoDiv = document.getElementById("checkSiteContentDiv");
+
+        inputDiv!.style.display = "none";
+        companyInfoDiv!.style.display = "block";
+        setCurrentCompanyIndex(0);
+        setCompanyDomains(currentCompanyDomains);
+        findCompanyInfo(currentCompanyDomains);
+    }
+
+    function resetCompanyInfoDiv() {
+        for(let i = 0; i < 4; i++) {
+            const e1 = document.getElementById(`${i}_loading_animation`);
+            const e2 = document.getElementById(`${i}_check`);
+            const e3 = document.getElementById(`${i}_cross`);
+
+            if (i === 0) {
+                e1!.style.display = "block";
+                e2!.style.display = "none";
+                e3!.style.display = "none";
+            } else {
+                e1!.style.display = "none";
+                e2!.style.display = "none";
+                e3!.style.display = "none";
+            }
+        }
+    }
+
+    async function findCompanyInfo(currentCompanyDomains: Array<string>) {
+        const endpoints = ["/about", "/aboutus", "/about-us", "/"];
+        let currentCompanyInfo = []
+        for(let i = 0; i < currentCompanyDomains.length; i++) {
+            console.log("lmao")
+            for(let j = 0; j < endpoints.length; j++) {
+                try {
+                    const response = await axios.get(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
+
+                    
+                    currentCompanyInfo.push(response.data);
+                    const loadAnimation = document.getElementById(`${j}_loading_animation`);
+                    const check = document.getElementById(`${j}_check`);
+                    loadAnimation!.style.display = "none";
+                    check!.style.display = "block";
+
+                    if (i != currentCompanyDomains.length-1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        resetCompanyInfoDiv();
+                        setCurrentCompanyIndex(i+1);
+                        const domainsDup = currentCompanyDomains.slice(0);
+                        setCompanyDomains(domainsDup);
+                    }
+                    break;
+                   
+                } catch {
+                    console.log("error")
+                    const loadAnimation = document.getElementById(`${j}_loading_animation`);
+                    const cross = document.getElementById(`${j}_cross`);
+                    loadAnimation!.style.display = "none";
+                    cross!.style.display = "block";
+
+                    if (j != 3) {
+                        const nextLoadAnimation = document.getElementById(`${j+1}_loading_animation`);
+                        nextLoadAnimation!.style.display = "block";
+                    }
+                    continue;
+                }
+            }
+        }
+    }
+
+
     useEffect(()=>{
         window.onload = (event) => {
             populateTemplates();
@@ -223,45 +330,169 @@ function desktopView() {
                     <p className="text-3xl text-[#121212] font-semibold">Cold Email Generator</p>
                 </div>
                 <div className="w-full h-[calc(100%-70px)] flex justify-between items-center p-[30px]">
-                    <div className="h-full w-[calc(50%-15px)] bg-white rounded-[5px] border-1 border-zinc-300 p-[30px]">
-                        <p className="text-3xl text-[#121212] font-medium">Recipients</p>
-                        <p className="text-zinc-400 font-normal">Enter email addresses manually or upload a file</p>
-                        <br />
-                        <div className="w-full h-[50px] bg-zinc-300 rounded-[5px] p-[5px] flex justify-between items-center">
-                            <div className="h-full w-[calc(50%-5px)] bg-white rounded-[2.5px] flex justify-center items-center text-[#121212] hover:cursor-pointer" id="emailInputManualTab" onClick={()=>{toggleCurrentEmailInputTab("manual")}}>
-                                <p>Enter Manually</p>
-                            </div>
-                            <div className="h-full w-[calc(50%-5px)] bg-transparent rounded-[2.5px] flex justify-center items-center text-zinc-500 hover:cursor-pointer" id="emailInputUploadTab" onClick={()=>{toggleCurrentEmailInputTab("upload")}}>
-                                <p>Upload List</p>
-                            </div>
-                        </div>
-                        <div className="h-[calc(100%-225px)]" id="manualDiv">
-                            <div className="w-full h-[50px] flex justify-between items-center">
-                                <p className="text-lg text-[#121212] font-medium">Email Addresses</p>
-                            </div>
-                            <textarea className="w-full h-[calc(100%-50px)] bg-white rounded-[5px] border-1 border-zinc-300 resize-none p-[10px] text-[#121212] focus:outline-zinc-200 focus:outline-[2px] focus:outline-offset-2" placeholder="Enter email addresses (one per line)"></textarea>
-                        </div>
-
-                        <div className="hidden h-[calc(100%-225px)]" id="uploadDiv">
+                    {/* This is the div that shows up first on the left by default */}
+                    <div className="w-[calc(50%-15px)] h-full" id="emailInputTab">
+                        <div className="h-full w-full bg-white rounded-[5px] border-1 border-zinc-300 p-[30px]">
+                            <p className="text-3xl text-[#121212] font-medium">Recipients</p>
+                            <p className="text-zinc-400 font-normal">Enter email addresses manually or upload a file</p>
                             <br />
-                            <div className="w-full h-[calc(100%-50px)] bg-white rounded-[5px] border-3 border-dashed border-zinc-300 resize-none p-[20px] text-[#121212]">
-                                <div className="w-full h-full flex flex-col items-center">
-                                    <div className="w-full flex items-center justify-center">
-                                        <Image 
-                                            src="/upload.svg"
-                                            height={60}
-                                            width={60}
-                                            alt="upload"                                
-                                        />
-                                    </div>
-                                    <p className="text-lg text-[#121212] font-medium text-center">Drag and drop your files here or click the button to browse</p>
-                                    <p className="text-zinc-400 text-sm text-center">Supports CSV or TXT files (Max 20 email addresses)</p>
-                                    <input className="hidden" type="file" id="uploadFile"/>
-                                    <br />
-                                    <div className="h-[50px] w-[150px] bg-white hover:cursor-pointer hover:bg-zinc-100 rounded-[5px] border-1 border-zinc-300 flex justify-center items-center ease-in-out duration-150" onClick={handleFileUploadButton}>
-                                        <p className="font-medium">Select File</p>
+                            <div className="w-full h-[50px] bg-zinc-300 rounded-[5px] p-[5px] flex justify-between items-center">
+                                <div className="h-full w-[calc(50%-5px)] bg-white rounded-[2.5px] flex justify-center items-center text-[#121212] hover:cursor-pointer" id="emailInputManualTab" onClick={()=>{toggleCurrentEmailInputTab("manual")}}>
+                                    <p>Enter Manually</p>
+                                </div>
+                                <div className="h-full w-[calc(50%-5px)] bg-transparent rounded-[2.5px] flex justify-center items-center text-zinc-500 hover:cursor-pointer" id="emailInputUploadTab" onClick={()=>{toggleCurrentEmailInputTab("upload")}}>
+                                    <p>Upload List</p>
+                                </div>
+                            </div>
+                            <div className="h-[calc(100%-225px)]" id="manualDiv">
+                                <div className="w-full h-[50px] flex justify-between items-center">
+                                    <p className="text-lg text-[#121212] font-medium">Email Addresses</p>
+                                </div>
+                                <textarea className="w-full h-[calc(100%-50px)] bg-white rounded-[5px] border-1 border-zinc-300 resize-none p-[10px] text-[#121212] focus:outline-zinc-200 focus:outline-[2px] focus:outline-offset-2" id="emailInputManual" placeholder="Enter email addresses (one per line)"></textarea>
+                            </div>
+
+                            <div className="hidden h-[calc(100%-225px)]" id="uploadDiv">
+                                <br />
+                                <div className="w-full h-[calc(100%-50px)] bg-white rounded-[5px] border-3 border-dashed border-zinc-300 resize-none p-[20px] text-[#121212]">
+                                    <div className="w-full h-full flex flex-col items-center">
+                                        <div className="w-full flex items-center justify-center">
+                                            <Image 
+                                                src="/upload.svg"
+                                                height={60}
+                                                width={60}
+                                                alt="upload"                                
+                                            />
+                                        </div>
+                                        <p className="text-lg text-[#121212] font-medium text-center">Drag and drop your files here or click the button to browse</p>
+                                        <p className="text-zinc-400 text-sm text-center">Supports CSV or TXT files (Max 20 email addresses)</p>
+                                        <input className="hidden" type="file" id="uploadFile"/>
+                                        <br />
+                                        <div className="h-[50px] w-[150px] bg-white hover:cursor-pointer hover:bg-zinc-100 rounded-[5px] border-1 border-zinc-300 flex justify-center items-center ease-in-out duration-150" onClick={handleFileUploadButton}>
+                                            <p className="font-medium">Select File</p>
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div className="w-full h-[70px] flex items-center justify-end pt-[10px] pb-[10px]">
+                                <div className="w-[150px] h-[50px] bg-[#121212] rounded-[5px] flex items-center justify-center hover:cursor-pointer">
+                                    <p className="text-zinc-100 text-lg font-normal" onClick={handleNextStepClick}>Next Steps</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* next step div, this shows up when user presses next button */}
+                    <div className="w-[calc(50%-15px)] h-full hidden" id="checkSiteContentDiv">
+                        <div className="w-full h-full border-1 border-zinc-300 rounded-[5px] p-[30px] relative">
+                            <div className="w-full flex text-nowrap text-ellipsis pb-[10px]">
+                                <img src={`https://www.google.com/s2/favicons?domain=${companyDomains[currentCompanyIndex]}&sz=40`} className="h-[40px] w-[40px] mr-[10px] rounded-[5px]" alt="companyLogo" />
+                                <p className="text-3xl text-[#121212] font-medium text-nowrap text-ellipsis w-[calc(100%-50px)] overflow-clip">{companyDomains[currentCompanyIndex]}</p>
+                            </div>
+                            <p className="text-zinc-400 font-normal">Finding infromation about {companyDomains[currentCompanyIndex]}</p>
+                            <br />
+                            <div className="h-[50px] w-full flex justify-between items-center">
+                                <div className="w-[calc(100%-60px)] pl-[10px]">
+                                    <a href={`https://www.${companyDomains[currentCompanyIndex]}/about`} className="text-blue-500 text-xl" >{companyDomains[currentCompanyIndex]}/about</a>
+                                </div>
+                                <div className="h-[30px] w-[40px] pr-[10px]">
+                                    <div className="w-[30px] aspect-square rounded-[50%] border-4 border-4 border-t-[#121212] border-b-[#121212] border-r-white border-l-white animate-myspin" id="0_loading_animation"></div>
+                                    <div className="w-[30px] h-[30px] hidden" id="0_check">
+                                        <Image
+                                            src="/check_green.svg"
+                                            height={30}
+                                            width={30}
+                                            alt="check"
+                                        />
+                                    </div>
+                                    <div className="w-[30px] h-[30px] hidden" id="0_cross">
+                                        <Image
+                                            src="/close_red.svg"
+                                            height={30}
+                                            width={30}
+                                            alt="check"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="h-[50px] w-full flex justify-between items-center">
+                                <div className="w-[calc(100%-60px)] pl-[10px]">
+                                    <a href={`https://www.${companyDomains[currentCompanyIndex]}/aboutus`} className="text-blue-500 text-xl" >{companyDomains[currentCompanyIndex]}/aboutus</a>
+                                </div>
+                                <div className="h-[30px] w-[40px] pr-[10px]">
+                                    <div className="w-[30px] aspect-square rounded-[50%] border-4 border-4 border-t-[#121212] border-b-[#121212] border-r-white border-l-white animate-myspin hidden" id="1_loading_animation"></div>
+                                    <div className="w-[30px] h-[30px] hidden" id="1_check">
+                                        <Image
+                                            src="/check_green.svg"
+                                            height={30}
+                                            width={30}
+                                            alt="check"
+                                        />
+                                    </div>
+                                    <div className="w-[30px] h-[30px] hidden" id="1_cross">
+                                        <Image
+                                            src="/close_red.svg"
+                                            height={30}
+                                            width={30}
+                                            alt="check"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="h-[50px] w-full flex justify-between items-center">
+                                <div className="w-[calc(100%-60px)] pl-[10px]">
+                                    <a href={`https://www.${companyDomains[currentCompanyIndex]}}/about-us`} className="text-blue-500 text-xl" >{companyDomains[currentCompanyIndex]}/about-us</a>
+                                </div>
+                                <div className="h-[30px] w-[40px] pr-[10px]">
+                                    <div className="w-[30px] aspect-square rounded-[50%] border-4 border-4 border-t-[#121212] border-b-[#121212] border-r-white border-l-white animate-myspin hidden" id="2_loading_animation"></div>
+                                    <div className="w-[30px] h-[30px] hidden" id="2_check">
+                                        <Image
+                                            src="/check_green.svg"
+                                            height={30}
+                                            width={30}
+                                            alt="check"
+                                        />
+                                    </div>
+                                    <div className="w-[30px] h-[30px] hidden" id="2_cross">
+                                        <Image
+                                            src="/close_red.svg"
+                                            height={30}
+                                            width={30}
+                                            alt="check"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="h-[50px] w-full flex justify-between items-center">
+                                <div className="w-[calc(100%-60px)] pl-[10px]">
+                                    <a href={`https://www.${companyDomains[currentCompanyIndex]}/`} className="text-blue-500 text-xl" >{companyDomains[currentCompanyIndex]}/</a>
+                                </div>
+                                <div className="h-[30px] w-[40px] pr-[10px]">
+                                    <div className="w-[30px] aspect-square rounded-[50%] border-4 border-4 border-t-[#121212] border-b-[#121212] border-r-white border-l-white animate-myspin hidden" id="3_loading_animation"></div>
+                                    <div className="w-[30px] h-[30px] hidden" id="3_check">
+                                        <Image
+                                            src="/check_green.svg"
+                                            height={30}
+                                            width={30}
+                                            alt="check"
+                                        />
+                                    </div>
+                                    <div className="w-[30px] h-[30px] hidden" id="3_cross">
+                                        <Image
+                                            src="/close_red.svg"
+                                            height={30}
+                                            width={30}
+                                            alt="check"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="w-full h-[50px] flex justify-center items-center">
+                                <p className="text-[#121212] font-normal text-xl">{currentCompanyIndex+1} / {companyDomains.length}</p>
+                            </div>
+                            <br />
+                            <div className="w-full h-[50px] flex justify-between items-center">
+                                <div className="w-[150px] h-full flex items-center justify-center bg-white border-1 border-zinc-300 rounded-[5px] text-[#121212] font-normal hover:cursor-pointer" onClick={handleBack}>Back</div>
+                                <div className="w-[150px] h-full flex items-center justify-center bg-[#121212] border-1 border-zinc-300 rounded-[5px] text-zinc-100 font-normal hover:cursor-pointer" onClick={generateMails}>Generate</div>
                             </div>
                         </div>
                     </div>
