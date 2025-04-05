@@ -24,7 +24,13 @@ declare global {
     }
 }
 
-export default function Dashboard() {
+interface InvdividualTemplate {
+    templateName: string, 
+    subject: string,
+    message: string,
+}
+
+export default function Templates() {
     let visible: boolean = false;
     let navBarImage: string = "/hamburger.svg"
     let rotated: boolean = false;
@@ -81,17 +87,34 @@ export default function Dashboard() {
         const templateName = document.getElementById("newTemplateName");
         const subjectDiv = document.getElementById("newTemplateSubjectContent");
         const contentDiv = document.getElementById("newTemplateMessageContent");
-        console.log(subjectDiv?.innerText);
-        console.log(contentDiv?.innerText);
+        const s: string | undefined = Cookies.get("templates");
+
         const obj = {
             templateName: templateName?.value || "",
             subject: subjectDiv?.innerText || "",
             message: contentDiv?.innerText || "", 
         }
 
-        console.log(JSON.stringify(obj));
-        Cookies.set("template", `${JSON.stringify(obj)}`, {expires: 1000});
-        //window.location.href = "/"
+        if (s === undefined) {
+    
+            const t = {
+                0: obj
+            }
+    
+            Cookies.set("templates", `${JSON.stringify(t)}`, {expires: 1000});
+        } else {
+            let t = JSON.parse(decodeURIComponent(s));
+            let i = 0;
+
+            for(const templateId in t) {
+                i = Number(templateId);
+            }
+
+            t[i+1] = obj;
+            Cookies.set("templates", `${JSON.stringify(t)}`, {expires: 1000});
+        }
+
+        
 
         return false;
     }
@@ -607,7 +630,7 @@ export default function Dashboard() {
                 </div>
             </div>
             <div className="w-full h-[calc(100%-70px)] mbp:h-full flex">
-                <div className="h-full w-[30%] max-w-[350px] hidden mbp:block bg-zinc-300">
+                <div className="h-full w-[30%] max-w-[300px] hidden mbp:block bg-zinc-100">
                     <div className="h-[70px] w-full flex justify-center items-center">
                         <Image 
                             src="/logo.svg"
