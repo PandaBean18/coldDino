@@ -8,9 +8,22 @@
 @theme {
   --breakpoint-mbp: 860px;
   --animate-myspin: myspin 1s infinite;
+  --animate-mygradient: mygradient 2s infinite;
 
   @keyframes myspin {
     100% {transform: rotate(.5turn)}  
+  }
+
+  @keyframes mygradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
 }
 

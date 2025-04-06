@@ -97,7 +97,7 @@ export default function Home() {
     return () => clearInterval(interval);
 }, []);
 
-  let authUri = "/signin"
+  let [authUri, setAuthUri] = useState("/signin");
 
   function handleRedirect() {
     window.location.href = authUri;
@@ -111,17 +111,11 @@ export default function Home() {
         return;
       }
 
-      const resp: googleCertsResp = await axios.get("https://www.googleapis.com/oauth2/v3/certs");
-      let v = await jwtVerify(jwt, resp.data.keys[0]);
-      const date = new Date();
-      const time = date.getTime() / 1000;
-      if ((v.payload.exp === undefined) || (time > v.payload.exp!)) {
-        return;
-      } else if (v.protectedHeader.kid !== resp.data.keys[0].kid) {
-        return;
-      }
-
-      authUri = "/dashboard";
+      const resp = await axios.post("/api/verify", {"token": jwt});
+      
+      if (resp.status === 200) {
+        setAuthUri("/dashboard/generate");
+      } 
     }
 
   }, [])

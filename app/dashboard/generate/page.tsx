@@ -11,6 +11,17 @@ interface InvdividualTemplate {
     message: string,
 }
 
+interface SiteInfoResponse {
+    domain: string,
+    title: string,
+    content: string,
+    excerpt: string
+}
+
+interface GeneratedText {
+    text: string,
+}
+
 declare global {
     interface HTMLElement {
         selectedIndex: number
@@ -25,11 +36,14 @@ function mobileView() {
 
 function desktopView() {
     let currentEmailInputTab = "manual";
-    let currentTemplateIndex = -1;
-    let templates: Array<InvdividualTemplate> = [];
+    let [currentTemplateIndex, setCurrentTemplateIndex] = useState(-1);
+    let [templates, setTemplates] = useState(Array<InvdividualTemplate>);
     let [companyDomains, setCompanyDomains] = useState(Array<string>);
     let [currentCompanyIndex, setCurrentCompanyIndex] = useState(-1);
-    let [companyInfo, setCompanyInfo] = useState(Array<string>);
+    let [companyInfo, setCompanyInfo] = useState(Array<SiteInfoResponse>);
+    let [mails, setMails] = useState(new Map<string, string>);
+    let [generatedContent, setGeneratedContent] = useState(Array<GeneratedText>);
+    let [currentMailPreviewCount, setCurrentMailPreviewCount] = useState(1);
 
     function createUrlAnchorTag(url: string, text: string | null = null) {
         const e = document.createElement("a");
@@ -95,13 +109,13 @@ function desktopView() {
         const obj: InvdividualTemplate = templates[ele!.selectedIndex-1];
         
         if (currentTemplateIndex === -1) {
-            currentTemplateIndex = ele!.selectedIndex - 1;
+            setCurrentTemplateIndex(ele!.selectedIndex - 1);
             const notTemplateSelectedDiv = document.getElementById("templatePreviewNothingSelected");
             const templateSelectedDiv = document.getElementById("templatePreviewSelected");
             notTemplateSelectedDiv!.style.display = "none";
             templateSelectedDiv!.style.display = "flex";
         } else {
-            currentTemplateIndex = ele!.selectedIndex - 1;
+            setCurrentTemplateIndex(ele!.selectedIndex - 1);
         }
 
         const previewSubject = document.getElementById("templatePreviewSubject");
@@ -168,15 +182,17 @@ function desktopView() {
 
         const obj = JSON.parse(decodeURIComponent(s!));
         const ele = document.getElementById("selectTemplate");
-
+        let currentTemplates: Array<InvdividualTemplate> = []
         for(let templateId in obj) {
             const currentTemplate: InvdividualTemplate = obj[templateId];
-            templates.push(currentTemplate);
+            currentTemplates.push(currentTemplate);
             const op = document.createElement("option");
             op.id = `template_${templateId}`;
             op.innerText = currentTemplate["templateName"];
             ele!.appendChild(op);
         }
+
+        setTemplates(currentTemplates)
     }
 
     function handleBack() {
@@ -188,8 +204,40 @@ function desktopView() {
         companyInfoDiv!.style.display = "none";
     }
 
-    function generateMails() {
-        return true;
+    async function generateMails() {
+        const ele = document.getElementById("selectTemplate");
+        if (ele!.selectedIndex === 0) {
+            alert("Please select a template before proceeding");
+            return false;
+        } 
+        const templatePreviewDiv = document.getElementById("templatePreviewDiv");
+        const generatedMailPreviewDiv = document.getElementById("generatedMailPreviewDiv");
+        templatePreviewDiv!.style.display = "none";
+        generatedMailPreviewDiv!.style.display = "block";
+
+        const currentGeneratedContent: Array<GeneratedText> = [];
+        for (let i = 0; i < companyInfo.length; i++) {
+            const generatedMailLoadingDiv = document.getElementById("generatedMailLoading");
+            const generatedMailLoadedDiv = document.getElementById("generatedMailLoaded");
+
+            const response = await axios.post("/api/generateContent", companyInfo[i]);
+
+            if (i === 0) {
+                const subjectDiv = document.getElementById("generatedMailSubject");
+                const messageDiv = document.getElementById("generatedMailMessage");
+
+                generatedMailLoadingDiv!.style.display = "none";
+                generatedMailLoadedDiv!.style.display = "block";
+                subjectDiv!.innerText = templates[currentTemplateIndex]["subject"].replaceAll("@companyName", companyInfo[i]["domain"]);
+                messageDiv!.innerText = (templates[currentTemplateIndex]["message"].replaceAll("@companyName", companyInfo[i]["domain"])).replaceAll("@generatedText", response.data["text"]);
+                formatText(messageDiv!);
+            }
+            currentGeneratedContent.push(response.data);
+            setGeneratedContent(currentGeneratedContent.slice(0))
+
+        }
+
+        setGeneratedContent(currentGeneratedContent);
     }
 
     function validateMail(str: string) {
@@ -201,7 +249,7 @@ function desktopView() {
         const mailsDivContent = mailsDiv!.value;
         const mails: Array<string> = mailsDivContent.trim().split("\n");
         const currentCompanyDomains = [];
-
+        let currentMails: Map<string, string> = new Map();
         for(let i = 0; i < mails.length; i++) {
             if (!validateMail(mails[i])) {
                 alert("Invalid mails detected.")
@@ -209,6 +257,7 @@ function desktopView() {
             }
             const currentDomain = mails[i].slice(mails[i].indexOf("@")+1);
             currentCompanyDomains.push(currentDomain);
+            currentMails.set(currentDomain, mails[i]);
         }
 
         const inputDiv = document.getElementById("emailInputTab");
@@ -218,7 +267,8 @@ function desktopView() {
         companyInfoDiv!.style.display = "block";
         setCurrentCompanyIndex(0);
         setCompanyDomains(currentCompanyDomains);
-        findCompanyInfo(currentCompanyDomains);
+        setMails(currentMails);
+        findCompanyInfo(currentCompanyDomains); 
     }
 
     function resetCompanyInfoDiv() {
@@ -241,14 +291,13 @@ function desktopView() {
 
     async function findCompanyInfo(currentCompanyDomains: Array<string>) {
         const endpoints = ["/about", "/aboutus", "/about-us", "/"];
-        let currentCompanyInfo = []
+        let currentCompanyInfo: Array<SiteInfoResponse> = []
         for(let i = 0; i < currentCompanyDomains.length; i++) {
             console.log("lmao")
             for(let j = 0; j < endpoints.length; j++) {
                 try {
                     const response = await axios.get(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
 
-                    
                     currentCompanyInfo.push(response.data);
                     const loadAnimation = document.getElementById(`${j}_loading_animation`);
                     const check = document.getElementById(`${j}_check`);
@@ -279,6 +328,96 @@ function desktopView() {
                 }
             }
         }
+        setCompanyInfo(currentCompanyInfo);
+        populateSiteContentStatusDiv(currentCompanyInfo, currentCompanyDomains);
+    }
+
+    function populateSiteContentStatusDiv(companyInfo: Array<SiteInfoResponse>, companyDomains: Array<string>) {
+        const ele = document.getElementById("siteContentStatus");
+        
+        for (let k = 0; k < ele!.childNodes!.length; k++) {
+            ele!.removeChild(ele!.childNodes[k]);
+        }
+
+        for(let i = 0; i < companyDomains.length; i++) {
+            let domainInfoFound = false;
+
+            const newDiv = document.createElement("div");
+            newDiv.className = "w-full h-[50px] flex justify-between items-center pl-[10px]";
+
+            const innerDiv = document.createElement("div");
+            innerDiv.className = "w-[calc(100%-50px)] h-full flex items-center";
+
+            const innerDivImage = document.createElement("img");
+            innerDivImage.className = "h-[30px] w-[30px] mr-[10px] rounded-[5px]";
+            innerDivImage.alt = "companyLogo";
+            innerDivImage.src = `https://www.google.com/s2/favicons?domain=${companyDomains[i]}&sz=40`;
+            innerDiv.appendChild(innerDivImage);
+
+            const innerDivPara = document.createElement("p");
+            innerDivPara.className = "text-2xl text-[#121212] font-medium text-nowrap text-ellipsis w-[calc(100%-50px)] overflow-clip";
+            innerDivPara.innerHTML = companyDomains[i];
+            innerDiv.appendChild(innerDivPara);
+
+            const img = document.createElement("img");
+            img.className = "pr-[10px]";
+            img.style.color = "transparent";
+            img.decoding = "async";
+            img.height = 40;
+            img.width = 40;
+            img.loading = "lazy";
+
+            for(let j = 0; j < companyInfo.length; j++) {
+                if (companyInfo[j]["domain"] === companyDomains[i]) {
+                    domainInfoFound = true;
+                    img.src = "/check_green.svg";
+                    img.alt = "check";
+                    break;
+                }
+            }
+
+            if (!domainInfoFound) {
+                img.src = "/close_red.svg";
+                img.alt = "cross";
+            }
+
+            newDiv.appendChild(innerDiv);
+            newDiv.appendChild(img);
+            ele!.appendChild(newDiv);
+        }
+
+        const e1 = document.getElementById("siteContentStatusReviewDiv");
+        const e2 = document.getElementById("checkSiteContentDiv");
+        e2!.style.display = "none";
+        e1!.style.display = "block";
+    }
+
+    function handleMailPreviewClick(dir: string) {
+        if (dir === "right") {
+            if (currentMailPreviewCount < generatedContent.length) {
+                console.log(currentMailPreviewCount)
+                setCurrentMailPreviewCount(currentMailPreviewCount+1);
+                const subjectDiv = document.getElementById("generatedMailSubject");
+                const messageDiv = document.getElementById("generatedMailMessage");
+
+                subjectDiv!.innerText = templates[currentTemplateIndex]["subject"].replaceAll("@companyName", companyInfo[currentMailPreviewCount]["domain"]);
+                messageDiv!.innerText = (templates[currentTemplateIndex]["message"].replaceAll("@companyName", companyInfo[currentMailPreviewCount]["domain"])).replaceAll("@generatedText", generatedContent[currentMailPreviewCount]["text"]);
+                console.log(currentMailPreviewCount)
+                formatText(messageDiv!);
+            }
+        } else if (dir === "left") {
+            if (currentMailPreviewCount > 1) {
+                setCurrentMailPreviewCount(currentMailPreviewCount-1);
+                const subjectDiv = document.getElementById("generatedMailSubject");
+                const messageDiv = document.getElementById("generatedMailMessage");
+
+                subjectDiv!.innerText = templates[currentTemplateIndex]["subject"].replaceAll("@companyName", companyInfo[currentMailPreviewCount-2]["domain"]);
+                messageDiv!.innerText = (templates[currentTemplateIndex]["message"].replaceAll("@companyName", companyInfo[currentMailPreviewCount-2]["domain"])).replaceAll("@generatedText", generatedContent[currentMailPreviewCount-2]["text"]);
+                formatText(messageDiv!);
+            }
+        }
+
+        
     }
 
 
@@ -464,7 +603,7 @@ function desktopView() {
                             </div>
                             <div className="h-[50px] w-full flex justify-between items-center">
                                 <div className="w-[calc(100%-60px)] pl-[10px]">
-                                    <a href={`https://www.${companyDomains[currentCompanyIndex]}/`} className="text-blue-500 text-xl" >{companyDomains[currentCompanyIndex]}/</a>
+                                    <a href={`https://${companyDomains[currentCompanyIndex]}/`} className="text-blue-500 text-xl" >{companyDomains[currentCompanyIndex]}/</a>
                                 </div>
                                 <div className="h-[30px] w-[40px] pr-[10px]">
                                     <div className="w-[30px] aspect-square rounded-[50%] border-4 border-4 border-t-[#121212] border-b-[#121212] border-r-white border-l-white animate-myspin hidden" id="3_loading_animation"></div>
@@ -492,16 +631,35 @@ function desktopView() {
                             <br />
                             <div className="w-full h-[50px] flex justify-between items-center">
                                 <div className="w-[150px] h-full flex items-center justify-center bg-white border-1 border-zinc-300 rounded-[5px] text-[#121212] font-normal hover:cursor-pointer" onClick={handleBack}>Back</div>
-                                <div className="w-[150px] h-full flex items-center justify-center bg-[#121212] border-1 border-zinc-300 rounded-[5px] text-zinc-100 font-normal hover:cursor-pointer" onClick={generateMails}>Generate</div>
+                                <div className="w-[150px] h-full flex items-center justify-center bg-[#121212] border-1 border-zinc-300 rounded-[5px] text-zinc-100 font-normal hover:cursor-pointer">Generate</div>
                             </div>
                         </div>
                     </div>
-                    <div className="h-full w-[calc(50%-15px)] bg-white rounded-[5px] border-1 border-zinc-300 p-[30px]">
+                    {/* this is the div that is rendered after data of all sites has been fetched */}
+                    <div className="w-[calc(50%-15px)] h-full hidden" id="siteContentStatusReviewDiv">
+                        <div className="w-full h-full border-1 border-zinc-300 rounded-[5px] p-[30px] flex flex-col">
+                            <p className="text-3xl text-[#121212] font-medium">Content Status</p>
+                            <p className="text-zinc-400 font-normal">The application was able to find information for the following companies:</p>
+                            <br />
+                            <div className="w-full grow-1 overflow-hidden overflow-y-scroll" id="siteContentStatus">
+                                
+                            </div>
+                            <br />
+                            <div className="w-full h-[50px] flex justify-end items-center">
+                                <div className="h-full w-[150px] bg-[#121212] flex justify-center items-center rounded-[5px] hover:cursor-pointer" onClick={generateMails}>
+                                    <p className="text-zinc-100">Generate</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* template preview div*/}
+                    <div className="h-full w-[calc(50%-15px)] bg-white rounded-[5px] border-1 border-zinc-300 p-[30px]" id="templatePreviewDiv">
                         <p className="text-3xl text-[#121212] font-medium">Email Template</p>
                         <p className="text-zinc-400 font-normal">Select the template you want to use</p>
                         <br />
-                        <select className="h-[50px] w-full rounded-[5px] text-[#121212] border-1 border-zinc-300 focus:outline-zinc-200 focus:outline-[2px] focus:outline-offset-2" name="selectedTemplate" id="selectTemplate" onChange={(event)=>{updateTemplatePreview()}}>
-                            <option className="mt-[20px]" defaultValue="select" selected disabled>Select Template</option>
+                        <select className="h-[50px] w-full rounded-[5px] text-[#121212] border-1 border-zinc-300 focus:outline-zinc-200 focus:outline-[2px] focus:outline-offset-2" name="selectedTemplate" id="selectTemplate" onChange={(event)=>{updateTemplatePreview()}} defaultValue="selectOption">
+                            <option className="mt-[20px]" value="selectOption" disabled>Select Template</option>
                         </select>
                         <div className="w-full h-[50px] flex justify-between items-center">
                             <p className="text-lg text-[#121212] font-medium">Template Preview</p>
@@ -525,6 +683,40 @@ function desktopView() {
                                 <p className="text-[#121212] text-sm mr-[10px]">Message Content</p>
                                 <div className="w-full border-1 border-zinc-300 rounded-[2.5px] p-[10px] text-[#121212] overflow-y-scroll flex-1" id="templatePreviewMessage"></div>
                             </div>
+                        </div>
+                    </div>
+                    {/* generated text mails */}
+                    <div className="h-full w-[calc(50%-15px)] bg-white rounded-[5px] border-1 border-zinc-300 p-[30px] hidden" id="generatedMailPreviewDiv">
+                        <div className="h-[calc(100%-50px)] w-full border-b-1 border-zinc-300 overflow-hidden overflow-y-scroll hidden" id="generatedMailLoaded">
+                            <p className="text-[#121212] text-xl mr-[10px]">Mail To: {(companyInfo.length === 0) ? "" : mails.get(companyInfo[currentMailPreviewCount-1]["domain"])}</p>
+                            <br />
+                            <p className="text-[#121212] text-sm mr-[10px]">Subject line</p>
+                            <div className="h-[50px] w-full border-1 border-zinc-300 rounded-[2.5px] p-[10px] text-[#121212] overflow-x-scroll overflow-y-hidden text-nowrap text-clip" id="generatedMailSubject"></div>
+                            <br />
+                            <p className="text-[#121212] text-sm mr-[10px]">Message Content</p>
+                            <div className="w-full border-1 border-zinc-300 rounded-[2.5px] p-[10px] text-[#121212] overflow-y-scroll flex-1" id="generatedMailMessage"></div>
+                        </div>
+                        <div className="h-[calc(100%-50px)] w-full border-b-1 border-zinc-300] flex flex-col justify-center items-center" id="generatedMailLoading">
+                            <p className="text-4xl font-semibold bg-gradient-to-r from-cyan-500 to-green-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-mygradient pb-1">Generating...</p>
+                        </div>
+                        <div className="h-[50px] w-full flex justify-evenly items-center">
+                            <Image
+                                src="/arrow_left.svg"
+                                height={30}
+                                width={30}
+                                alt="left"
+                                className="hover:cursor-pointer"
+                                onClick={()=>{handleMailPreviewClick("left")}}
+                            />
+                            <p className="text-[#121212] text-xl">{currentMailPreviewCount} / {generatedContent.length}</p>
+                            <Image
+                                src="/arrow_right.svg"
+                                height={30}
+                                width={30}
+                                alt="right"
+                                className="hover:cursor-pointer"
+                                onClick={()=>{handleMailPreviewClick("right")}}
+                            />
                         </div>
                     </div>
                 </div>

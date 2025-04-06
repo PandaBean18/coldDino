@@ -2,8 +2,8 @@
 import Image from "next/image";
 import { useEffect } from "react";
 import axios from "axios";
-import { jwtVerify } from "jose";
-import Cookies from "js-cookie"
+import Cookies from "js-cookie";
+
 
 declare global {
     interface Window {
@@ -23,6 +23,8 @@ export default function Signin() {
     interface individualKeyInterface {
         kid: string,
         n: string,
+        kty: string, 
+        e: string,
     }
 
     interface keysInterface {
@@ -47,14 +49,14 @@ export default function Signin() {
 
     useEffect(() => {
         window.decodeJwtResponse = async function (payload: googleRespPayload) {
-            let token = payload.credential
-            const resp: googleCertsResp = await axios.get("https://www.googleapis.com/oauth2/v3/certs");
+            let token = payload.credential;
+            const response = await axios.post("/api/verify", {"token": token});
 
-            let v = await jwtVerify(token, resp.data.keys[0]);
-            if (v.protectedHeader.kid !== resp.data.keys[0].kid) {
-                alert("Login failed");
-            } else {
+            if (response.status === 200) {
                 Cookies.set("coldDinoJwt", token);
+                window.location.href = "/dashboard/generate";
+            } else {
+                alert("login failed");
             }
         }
     }, [])

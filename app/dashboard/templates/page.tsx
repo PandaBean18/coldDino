@@ -96,12 +96,12 @@ export default function Templates() {
         }
 
         if (s === undefined) {
-    
             const t = {
                 0: obj
             }
     
             Cookies.set("templates", `${JSON.stringify(t)}`, {expires: 1000});
+            window.location.href = "/dashboard/generate";
         } else {
             let t = JSON.parse(decodeURIComponent(s));
             let i = 0;
@@ -112,9 +112,8 @@ export default function Templates() {
 
             t[i+1] = obj;
             Cookies.set("templates", `${JSON.stringify(t)}`, {expires: 1000});
+            window.location.href = "/dashboard/generate";
         }
-
-        
 
         return false;
     }
@@ -440,7 +439,6 @@ export default function Templates() {
     function applyLink() {
         const gotoTextInput = document.getElementById("applyLinkGoToText");
         const url = gotoTextInput!.value;
-        console.log(url);
         messageTagListener(url);
         const parentDiv = document.getElementById("newTemplateForm");
         parentDiv!.removeChild(applyLinkDiv);
@@ -456,16 +454,10 @@ export default function Templates() {
         range.insertNode(e);
 
         const rect = e.getBoundingClientRect();
-
-        console.log("Left: ", rect.left);
-        console.log("Top: ", rect.top);
         e.parentNode!.removeChild(e);
 
         const d = document.getElementById("newTemplateMessageContent");
         const controlRect = d!.getBoundingClientRect();
-        console.log("Control Left: ", controlRect.left);
-        console.log("Control Top: ", controlRect.top);
-
         let x = rect.left + 10;
         let y = rect.top + 25;
 
@@ -615,6 +607,7 @@ export default function Templates() {
                             />
                         </div>
                     </div>
+                    
                     <div className="w-[70%] p-[0px] rounded-[5px] flex flex-col justify-center items-center duration-100 h-0 bg-zinc-400 overflow-hidden" id="templateListSidebar">
                         <div className="template w-full hover:cursor-pointer">
                             <p className="text-[#121212]">Template 1</p>
@@ -662,6 +655,7 @@ export default function Templates() {
                                 />
                             </div>
                         </div>
+                        
                         <div className="w-[70%] p-[0px] rounded-[5px] flex flex-col justify-center items-center duration-100 h-0 bg-slate-200 overflow-hidden" id="templateList">
                             <div className="template w-full hover:cursor-pointer">
                                 <p className="text-[#121212]">Template 1</p>
@@ -672,6 +666,17 @@ export default function Templates() {
                             </div>
                             <div className="w-[80%] h-[35px] bg-[#121212] rounded-[2.5px] mt-[10px] flex justify-center items-center hover:cursor-pointer">
                                 <p className="text-zinc-100">New Template</p>
+                            </div>
+                        </div>
+                        <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] hover:cursor-pointer">
+                            <div className="flex items-center">
+                                <Image
+                                    src="/sparkle.svg"
+                                    height={25}
+                                    width={25}
+                                    alt="ai"
+                                />
+                                <p className="text-[#121212] font-normal ml-[10px]">Generate Email</p>
                             </div>
                         </div>
                     </div>
