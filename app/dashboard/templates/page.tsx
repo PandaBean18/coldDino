@@ -256,6 +256,9 @@ export default function Templates() {
             for(let a = 0; a <= (charCount+1); a++) {
                 selection!.modify("move", "right", "character")
             }
+            messageTagListener();
+        } else if (event.key === " " || event.key === "," || event.key === ";" || event.key === ".") {
+            messageTagListener();
         }
     }
 
@@ -748,9 +751,10 @@ export default function Templates() {
                                                 d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateMessageContent"></p>`
                                                 const e = document.getElementById("newTemplateMessageContent") 
                                                 e!.focus();
-                                                e!.addEventListener("input", (event) => {
-                                                    messageTagListener();
-                                                })
+                                                // e!.addEventListener("keydown", (event) => {
+                                                //     console.log(event.key)
+                                                //     messageTagListener();
+                                                // })
 
                                                 e!.addEventListener("keydown", (event) => {
                                                     messageKeyListener(event);

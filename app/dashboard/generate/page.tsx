@@ -44,6 +44,7 @@ function desktopView() {
     let [mails, setMails] = useState(new Map<string, string>);
     let [generatedContent, setGeneratedContent] = useState(Array<GeneratedText>);
     let [currentMailPreviewCount, setCurrentMailPreviewCount] = useState(1);
+    let [mailAction, setMailAction] = useState("Drafts")
 
     function createUrlAnchorTag(url: string, text: string | null = null) {
         const e = document.createElement("a");
@@ -420,6 +421,29 @@ function desktopView() {
         
     }
 
+    function handleMailActionsDropDown() {
+        const ele = document.getElementById("emailActionsDropDownDiv");
+        const img = document.getElementById("mailActionsDropDownImage")
+        if (ele!.style.height === "0px") {
+            ele!.style.height = "100px";
+            img!.style.transform = "rotate(180deg)";
+        } else {
+            ele!.style.height = "0";
+            img!.style.transform = "rotate(0deg)";
+        }
+    }
+
+    function handleMailActionOptionClick(tabClicked: string) {
+        if (tabClicked === "drafts") {
+            setMailAction("Drafts");
+        } else if (tabClicked === "send") {
+            setMailAction("Send");
+        } else if (tabClicked === "sendAll") {
+            setMailAction("Send All");
+        }
+        handleMailActionsDropDown();
+    }
+
 
     useEffect(()=>{
         window.onload = (event) => {
@@ -687,14 +711,38 @@ function desktopView() {
                     </div>
                     {/* generated text mails */}
                     <div className="h-full w-[calc(50%-15px)] bg-white rounded-[5px] border-1 border-zinc-300 p-[30px] hidden" id="generatedMailPreviewDiv">
-                        <div className="h-[calc(100%-50px)] w-full border-b-1 border-zinc-300 overflow-hidden overflow-y-scroll hidden" id="generatedMailLoaded">
-                            <p className="text-[#121212] text-xl mr-[10px]">Mail To: {(companyInfo.length === 0) ? "" : mails.get(companyInfo[currentMailPreviewCount-1]["domain"])}</p>
+                        <div className="h-[calc(100%-50px)] w-full border-b-1 border-zinc-300 overflow-hidden overflow-y-scroll relative hidden" id="generatedMailLoaded">
+                            <div className="w-full h-[50px] flex items-center justify-between pr-[10px] pl-[10px] pt-0">
+                                <div className="w-[50%] text-nowrap">
+                                    <p className="text-[#121212] text-xl mr-[10px] truncate">To: {(companyInfo.length === 0) ? "" : mails.get(companyInfo[currentMailPreviewCount-1]["domain"])}</p>
+                                </div>
+                                <div className="w-[150px] h-[50px] bg-[#121212] border-1 border-zinc-400 rounded-[5px] hover:cursor-pointer hover:bg-zinc-800  duration-250 ease-in-out p-[10px] flex justify-between items-center" id="emailActionButton">
+                                    <p className="">{mailAction}</p>
+                                    <Image
+                                        src="/drop_down_white.svg"
+                                        height={30}
+                                        width={30}
+                                        alt="down"
+                                        onClick={handleMailActionsDropDown}
+                                        id="mailActionsDropDownImage"   
+                                        className="duration-100 ease-in-out"                       
+                                    />
+                                </div>
+                            </div>
+                            <div className="w-full h-0 pr-[10px] flex items-center justify-end absolute top-[50px] duration-100 ease-in-out" id="emailActionsDropDownDiv">
+                                <div className="w-[150px] h-full bg-[#121212] border-1 border-zinc-300 rounded-[5px] overflow-hidden pr-[10px] pl-[10px]">
+                                    <div className="h-[33%] hover:bg-zinc-800 hover:cursor-pointer flex justify-center items-center text-white" id="dropDownOption_drafts" onClick={()=>{handleMailActionOptionClick("drafts")}}>Drafts</div>
+                                    <div className="h-[33%] hover:bg-zinc-800 hover:cursor-pointer border-t-1 border-b-1 border-zinc-500 flex justify-center items-center text-white" id="dropDownOption_send" onClick={()=>{handleMailActionOptionClick("send")}}>Send</div>
+                                    <div className="h-[33%] hover:bg-zinc-800 hover:cursor-pointer flex justify-center items-center text-white" id="dropDownOption_sendAll" onClick={()=>{handleMailActionOptionClick("sendAll")}}>Send All</div>
+                                </div>
+                            </div>
                             <br />
                             <p className="text-[#121212] text-sm mr-[10px]">Subject line</p>
                             <div className="h-[50px] w-full border-1 border-zinc-300 rounded-[2.5px] p-[10px] text-[#121212] overflow-x-scroll overflow-y-hidden text-nowrap text-clip" id="generatedMailSubject"></div>
                             <br />
                             <p className="text-[#121212] text-sm mr-[10px]">Message Content</p>
-                            <div className="w-full border-1 border-zinc-300 rounded-[2.5px] p-[10px] text-[#121212] overflow-y-scroll flex-1" id="generatedMailMessage"></div>
+                            <div className="w-full border-1 border-zinc-300 rounded-[2.5px] p-[10px] text-[#121212] flex-1" id="generatedMailMessage"></div>
+                            <br />
                         </div>
                         <div className="h-[calc(100%-50px)] w-full border-b-1 border-zinc-300] flex flex-col justify-center items-center" id="generatedMailLoading">
                             <p className="text-4xl font-semibold bg-gradient-to-r from-cyan-500 to-green-500 bg-clip-text text-transparent bg-[length:200%_auto] animate-mygradient pb-1">Generating...</p>
