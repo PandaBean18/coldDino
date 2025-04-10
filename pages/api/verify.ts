@@ -25,6 +25,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const header = JSON.parse(Buffer.from(token.split('.')[0], 'base64').toString());
         const resp: googleCertsResp = await axios.get("https://www.googleapis.com/oauth2/v3/certs");
         const key = resp.data.keys.find(key => key.kid === header.kid);
+
+        if (!key) {
+            res.status(401).json({ message: "Invalid token" });
+            return;
+        }
+
         const publicKey = createPublicKey({
             key: {
             kty: key!.kty,
@@ -33,11 +39,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             },
             format: 'jwk'
         }).export({ type: 'spki', format: 'pem' });
-        let v = verify(token, publicKey, {algorithms: ["RS256"]});
-        if (v) {
-            res.status(200).json({"message": "valid token"})
-        } else {
-            console.log("failure")
+        try {
+            let v = verify(token, publicKey, {algorithms: ["RS256"]});
+
+            if (typeof(v) !== "string") {
+                console.log(v.exp);
+                res.status(200).json({"message": "valid token", "expiry": v.exp})
+            } else {
+                console.log("failure")
+                res.status(401).json({"message": "invalid token"})
+            }
+        } catch {
             res.status(401).json({"message": "invalid token"})
         }
     } else {

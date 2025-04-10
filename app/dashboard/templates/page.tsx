@@ -30,15 +30,23 @@ interface InvdividualTemplate {
     message: string,
 }
 
+interface InvdividualTemplate {
+    templateName: string, 
+    subject: string,
+    message: string,
+}
+
 export default function Templates() {
     let visible: boolean = false;
     let navBarImage: string = "/hamburger.svg"
     let rotated: boolean = false;
     let createNewTemplatePage: boolean = true;
-    let totalTemplateCount: number = 2;
+    let [totalTemplateCount, setTotalTemplateCount] = useState(0);
     const [newTemplateName, setNewTemplateName] = useState(`Template ${totalTemplateCount+1}`)
-    let subjectActive = false;
-    let contentActive = false;
+    let [subjectActive, setSubjectActive] = useState(false);
+    let [contentActive, setContentActive] = useState(false);
+    let [templates, setTemplates] = useState(Array<InvdividualTemplate>);
+    let [currentTemplateIndex, setCurrentTemplateIndex] = useState(0);
 
     function toggleSidebar() {
         const sidebar = document.getElementById("sidebar");
@@ -190,7 +198,7 @@ export default function Templates() {
         }
     }
 
-    function subjectTagListener(event: Event) {
+    function subjectTagListener() {
         const subjectDiv = document.getElementById("newTemplateSubjectContent");
         const charCount = getCountCharactersBefore(subjectDiv!);
         const text = subjectDiv!.innerText;
@@ -558,12 +566,77 @@ export default function Templates() {
         
     }
 
+    function populateTemplates() {
+        const s: string | undefined = Cookies.get("templates");
+
+        if (s == undefined) {
+            setTotalTemplateCount(0);
+            return;
+        }
+
+        const obj = JSON.parse(decodeURIComponent(s!));
+        const ele = document.getElementById("selectTemplate");
+        let currentTemplates: Array<InvdividualTemplate> = [];
+        let i = 0;
+        for(let templateId in obj) {
+            const currentTemplate: InvdividualTemplate = obj[templateId];
+            currentTemplates.push(currentTemplate);
+            i += 1;
+        }
+
+        setTotalTemplateCount(i);
+        setTemplates(currentTemplates)
+        setNewTemplateName(`Template ${i+1}`)
+    }
+
+    function handleChangeTemplateButton(str: string) {
+        const templateName = document.getElementById("newTemplateName");
+        document.getElementById("newTemplateSubject")?.click();
+        document.getElementById("newTemplateContent")?.click();
+
+        const subject = document.getElementById("newTemplateSubjectContent");
+        const message = document.getElementById("newTemplateMessageContent");
+
+        if (str === "up") {
+            if (currentTemplateIndex === 1) {
+                templateName!.value = "";
+                subject!.innerText = "";
+                message!.innerText = "";
+                setCurrentTemplateIndex(currentTemplateIndex-1);
+            } else if (currentTemplateIndex !== 0) {
+                templateName!.value = templates[currentTemplateIndex-2]["templateName"];
+                subject!.innerText = templates[currentTemplateIndex-2]["subject"];
+                message!.innerText = templates[currentTemplateIndex-2]["message"];
+
+                messageTagListener();
+                subjectTagListener();
+                setCurrentTemplateIndex(currentTemplateIndex-1);
+            }
+        } else if (str === "down") {
+            setSubjectActive(true);
+            setContentActive(true);
+            if (currentTemplateIndex < templates.length) {
+                console.log(templateName!.value)
+                subject!.innerHTML = templates[currentTemplateIndex]["subject"];
+                message!.innerText = templates[currentTemplateIndex]["message"];
+
+                messageTagListener();
+                subjectTagListener();
+                setCurrentTemplateIndex(currentTemplateIndex+1);
+                templateName!.value = templates[currentTemplateIndex]["templateName"];
+            }
+        }
+    }
+
     useEffect(()=>{
         const form = document.getElementById("newTemplateForm");
         form!.addEventListener("submit", (event)=>{
             createNewTemplate(event);
         })
 
+        window.onload = (event) => {
+            populateTemplates();
+        }
     }, [])
 
     return  (
@@ -697,12 +770,13 @@ export default function Templates() {
                                     width={50}
                                     alt="up"
                                     className="transform-[rotate(180deg)] hover:cursor-pointer"
+                                    onClick={()=>{handleChangeTemplateButton("up")}}
                                 />
                             </div>
                             <div className="flex flex-col justify-center items-center">
                                 <div className="rounded-[5px] border-1 border-zinc-300 p-[10px] w-[500px] flex flex-col flex-center items-center">
                                     <form className="w-full" id="newTemplateForm">
-                                        <input className="h-[50px] w-full text-3xl text-[#121212] font-semibold focus:outline-none" type="text" id="newTemplateName" value={newTemplateName} onChange={(e)=>{setNewTemplateName(e.target.value)}}/>
+                                        <input className="h-[50px] w-full text-3xl text-[#121212] font-semibold focus:outline-none" type="text" id="newTemplateName" value={currentTemplateIndex === 0 ? newTemplateName : templates[currentTemplateIndex-1]["templateName"]} onChange={(e)=>{setNewTemplateName(e.target.value)}} autoComplete="off"/>
                                         <p className="text-zinc-400">Fill in the details below to create a new template.</p>
                                         <br />
                                         <div className="flex items-center h-[20px] mb-[5px]">
@@ -714,7 +788,7 @@ export default function Templates() {
                                                 alt="copy"
                                             />
                                         </div>
-                                        <div id="newTemplateSubject" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap hover:cursor-text" contentEditable="false" onClick={() => {
+                                        <div id="newTemplateSubject" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap hover:cursor-text" onClick={() => {
                                             
                                             if (!subjectActive) {
                                                 const d = document.getElementById("newTemplateSubject")
@@ -723,7 +797,7 @@ export default function Templates() {
                                                 const e = document.getElementById("newTemplateSubjectContent") 
                                                 e!.focus();
                                                 e!.addEventListener("input", (event) => {
-                                                    subjectTagListener(event);
+                                                    subjectTagListener();
                                                 })
 
                                                 e!.addEventListener("keydown", (event) => {
@@ -744,7 +818,7 @@ export default function Templates() {
                                                 alt="copy"
                                             />
                                         </div>
-                                        <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 overflow-y-scroll rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 hover:cursor-text relative" id="newTemplateContent" contentEditable="false" onClick={() => {
+                                        <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 overflow-y-scroll rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 hover:cursor-text relative" id="newTemplateContent" onClick={() => {
                                             if (!contentActive) {
                                                 const d = document.getElementById("newTemplateContent")
                                                 d!.innerText = "";
@@ -786,12 +860,12 @@ export default function Templates() {
                                                     />
                                                 </div>
                                             </div>
-                                            <input className=" bg-[#121212] p-[10px] rounded-[10px] hover:cursor-pointer self-end" type="submit" value="Create new template"/>
+                                            <input className=" bg-[#121212] p-[10px] rounded-[10px] hover:cursor-pointer self-end" type="submit" value={currentTemplateIndex === 0 ? "Create new template" : "Update Template"}/>
                                         </div>
                                     </form>
                                     
                                 </div>
-                                <p className="text-[#121212] text-xl" style={{fontFamily: "Bebas Neue"}}>1/3</p>
+                                <p className="text-[#121212] text-xl" style={{fontFamily: "Bebas Neue"}}>{currentTemplateIndex+1} / {totalTemplateCount+1}</p>
                             </div>
                             <div className="h-[50px] w-[70px] pl-[20px]">
                                 <Image
@@ -800,6 +874,7 @@ export default function Templates() {
                                     width={50}
                                     alt="down"
                                     className="hover:cursor-pointer"
+                                    onClick={()=>{handleChangeTemplateButton("down")}}
                                 />
                             </div>
                         </div>

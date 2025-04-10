@@ -11,21 +11,21 @@ declare global {
   }
 }
 
+interface individualKeyInterface {
+  kid: string,
+  n: string,
+}
+
+interface keysInterface {
+  keys: Array<individualKeyInterface>
+}
+
+interface googleCertsResp {
+  data: keysInterface,
+  status: number,
+}
+
 export default function Home() {
-  interface individualKeyInterface {
-    kid: string,
-    n: string,
-  }
-
-  interface keysInterface {
-    keys: Array<individualKeyInterface>
-  }
-
-  interface googleCertsResp {
-    data: keysInterface,
-    status: number,
-  }
-
   const values = ["coolCoffeeStartup.com", "greatIndianBirds.in", "tastyBakedCookies.com", "crazyCandies.org", "fabulousFintech.com", "amazingAerospace.com", "poshPublishers.com"];
   const emails = ["hr@coolCoffeeStartup.com", "people@greatIndianBirds.in", "natasha@tastyBakedCookies.com", "cook@crazyCandies.org", "cto@fabulousFintech.com", "kevin@amazingAerospace.com", "editor@poshPublishers.com"]
   const subjects = [
@@ -111,11 +111,13 @@ export default function Home() {
         return;
       }
 
-      const resp = await axios.post("/api/verify", {"token": jwt});
-      
-      if (resp.status === 200) {
+      try {
+        await axios.post("/api/verify", {"token": jwt});
+        
         setAuthUri("/dashboard/generate");
-      } 
+      } catch {
+        return
+      }
     }
 
   }, [])
@@ -135,7 +137,7 @@ export default function Home() {
         </div>
         <div className="flex justify-between h-full w-fit items-center">
           <div className="justify-evenly hidden sm:flex">
-            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer">Features</p></div>
+            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{document.getElementById("features")?.scrollIntoView({behavior: "smooth"})}}>Features</p></div>
             <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer">Pricing</p></div>
             <div className="p-[5px] pr-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={handleRedirect}>Login</p></div>
           </div>
@@ -287,7 +289,7 @@ export default function Home() {
         </div>
       </div> */}
 
-      <div className="h-full w-full flex">
+      <div className="h-full w-full flex" id="features">
         <div className="w-[30%] h-full bg-white flex flex-col justify-center items-center">
           <p className="text-[#121212] text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>WHAT</p>
           <p className="text-[#121212] text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>DO WE</p>

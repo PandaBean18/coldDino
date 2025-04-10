@@ -31,11 +31,6 @@ export default function Signin() {
         keys: Array<individualKeyInterface>
     }
 
-    interface googleCertsResp {
-        data: keysInterface,
-        status: number,
-    }
-
     useEffect(() => {
         const script = document.createElement('script');
         script.src = 'https://accounts.google.com/gsi/client';
@@ -50,13 +45,21 @@ export default function Signin() {
     useEffect(() => {
         window.decodeJwtResponse = async function (payload: googleRespPayload) {
             let token = payload.credential;
-            const response = await axios.post("/api/verify", {"token": token});
+            try {
+                const response = await axios.post("/api/verify", {"token": token});
+                
+                Cookies.set("coldDinoJwt", token, {expires: 10});
 
-            if (response.status === 200) {
-                Cookies.set("coldDinoJwt", token);
-                window.location.href = "/dashboard/generate";
-            } else {
+                const gmailAuthCookie: string | undefined = Cookies.get("gmail_tokens");
+
+                if (gmailAuthCookie === undefined) {
+                    window.location.href = "/signin/allow";
+                } else {
+                    window.location.href = "/dashboard/generate";
+                }
+            } catch {
                 alert("login failed");
+                window.location.href = "/signin";
             }
         }
     }, [])
@@ -81,6 +84,7 @@ export default function Signin() {
                         data-login_uri="http://localhost:3000/verify"
                         data-auto_prompt="false"
                         data-callback="decodeJwtResponse"
+                        data-scope="email profile https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.compose"
                     >
                         <div className="g_id_signin"
                             data-type="standard"

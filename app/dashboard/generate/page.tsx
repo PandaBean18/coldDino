@@ -444,6 +444,27 @@ function desktopView() {
         handleMailActionsDropDown();
     }
 
+    async function handleMailActionClick() {
+        try {
+            const message = {
+                to: mails.get(companyInfo[currentMailPreviewCount-1]["domain"]),
+                subject: document.getElementById("generatedMailSubject")?.innerText,
+                body: document.getElementById("generatedMailMessage")?.innerHTML
+            }
+            if (mailAction === "Drafts") {
+                await axios.post("/api/saveDraft", message);
+            } else if (mailAction === "Send") {
+                await axios.post("/api/sendMail", message);
+            } else if (mailAction === "Send All") {
+
+            }
+            
+            document.getElementById("mailActionCompletedDiv")!.style.display = "flex";
+        } catch (error) {
+            console.log(error)
+            alert("Failure");
+        }
+    }
 
     useEffect(()=>{
         window.onload = (event) => {
@@ -465,7 +486,7 @@ function desktopView() {
                 </div>
                 <div className="w-full flex flex-col justify-center items-center">
                     <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] hover:cursor-pointer">
-                        <div className="flex items-center">
+                        <div className="flex items-center" onClick={()=>{window.location.href = "/dashboard/templates"}}>
                             <Image
                                 src="/mail_draft.svg"
                                 height={25}
@@ -717,7 +738,7 @@ function desktopView() {
                                     <p className="text-[#121212] text-xl mr-[10px] truncate">To: {(companyInfo.length === 0) ? "" : mails.get(companyInfo[currentMailPreviewCount-1]["domain"])}</p>
                                 </div>
                                 <div className="w-[150px] h-[50px] bg-[#121212] border-1 border-zinc-400 rounded-[5px] hover:cursor-pointer hover:bg-zinc-800  duration-250 ease-in-out p-[10px] flex justify-between items-center" id="emailActionButton">
-                                    <p className="">{mailAction}</p>
+                                    <p className="w-[calc(100%-30px)] h-full" onClick={handleMailActionClick}>{mailAction}</p>
                                     <Image
                                         src="/drop_down_white.svg"
                                         height={30}
@@ -731,9 +752,9 @@ function desktopView() {
                             </div>
                             <div className="w-full h-0 pr-[10px] flex items-center justify-end absolute top-[50px] duration-100 ease-in-out" id="emailActionsDropDownDiv">
                                 <div className="w-[150px] h-full bg-[#121212] border-1 border-zinc-300 rounded-[5px] overflow-hidden pr-[10px] pl-[10px]">
-                                    <div className="h-[33%] hover:bg-zinc-800 hover:cursor-pointer flex justify-center items-center text-white" id="dropDownOption_drafts" onClick={()=>{handleMailActionOptionClick("drafts")}}>Drafts</div>
-                                    <div className="h-[33%] hover:bg-zinc-800 hover:cursor-pointer border-t-1 border-b-1 border-zinc-500 flex justify-center items-center text-white" id="dropDownOption_send" onClick={()=>{handleMailActionOptionClick("send")}}>Send</div>
-                                    <div className="h-[33%] hover:bg-zinc-800 hover:cursor-pointer flex justify-center items-center text-white" id="dropDownOption_sendAll" onClick={()=>{handleMailActionOptionClick("sendAll")}}>Send All</div>
+                                    <div className="h-[50%] hover:bg-zinc-800 hover:cursor-pointer flex justify-center items-center text-white" id="dropDownOption_drafts" onClick={()=>{handleMailActionOptionClick("drafts")}}>Drafts</div>
+                                    <div className="h-[50%] hover:bg-zinc-800 hover:cursor-pointer border-t-1 border-zinc-500 flex justify-center items-center text-white" id="dropDownOption_send" onClick={()=>{handleMailActionOptionClick("send")}}>Send</div>
+                                    {/* <div className="h-[33%] hover:bg-zinc-800 hover:cursor-pointer flex justify-center items-center text-white" id="dropDownOption_sendAll" onClick={()=>{handleMailActionOptionClick("sendAll")}}>Send All</div> */}
                                 </div>
                             </div>
                             <br />
@@ -769,7 +790,21 @@ function desktopView() {
                     </div>
                 </div>
             </div>
-            
+            <div className="absolute bottom-5 w-full h-[50px] z-50 bg-transparent flex justify-center items-center hidden" id="mailActionCompletedDiv">
+                <div className="w-[250px] h-full bg-slate-800 border-1 border-zinc-300 rounded-[2.5px] flex items-center justify-between p-[10px]">
+                    <p className="text-white">{mailAction === "Drafts" ? "Saved to drafts" : "Mail sent"}</p>
+                    <Image
+                        src="/cross_white.svg"
+                        height={25}
+                        width={25}
+                        alt="cross"
+                        className="hover:cursor-pointer"
+                        onClick={()=>{
+                            document.getElementById("mailActionCompletedDiv")!.style.display = "none";
+                        }}
+                    />
+                </div>
+            </div>
         </div>
     )
 }
