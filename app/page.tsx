@@ -25,102 +25,104 @@ interface googleCertsResp {
   status: number,
 }
 
-export default function Home() {
-  const values = ["coolCoffeeStartup.com", "greatIndianBirds.in", "tastyBakedCookies.com", "crazyCandies.org", "fabulousFintech.com", "amazingAerospace.com", "poshPublishers.com"];
-  const emails = ["hr@coolCoffeeStartup.com", "people@greatIndianBirds.in", "natasha@tastyBakedCookies.com", "cook@crazyCandies.org", "cto@fabulousFintech.com", "kevin@amazingAerospace.com", "editor@poshPublishers.com"]
-  const subjects = [
-    "Eager to work with coolCoffeeStartup",
-    "Looking for opportunities at greatIndianBirds",
-    "Looking for freelance work at tastyBakedCookies",
-    "Seeking opportunities at crazyCandies",
-    "Want to contribute to fabulousFintech",
-    "Interested in working with amazingAerospace", 
-    "Website development services for poshPublishers"
-  ];
-  const generatedTexts = [
-    "I have been a coffee enthusiast all my life. My days usually start with coffee, and if they dont my day doesnt go well. I really like what your company is doing with regards to coffee.",
-    "As an avid bird watcher, and someone who has been interested in birds since a very young age, I am deeply impressed by what your company does.",
-    "Baking has been a hobby of mine since childhood, it has been one of the few things that I enjoy thoroughly. I have been following your company for a while and I really like the quality of your products.",
-    "I have been following your company for a long time, and have been consuming your products for the same. The quality of your products never ceases to amaze me.",
-    "As someone who has always been interested in finance and fintech, your company really amazes me. The work that your company is doing in the domain is revolutionary.",
-    "Ever since I was young, I have had an interest in aerospace. Everything about aeronautics and space amazes me. The work that your company is doing in this domain is amazing.",
-    "I have always had a keen interest in reading books, they have been a source of extreme joy and knowledge for me. Because of this, I hold special connection to your publishing house."
-  ]
-  
-  var currentIndex = 0;
-  const [currentValue, setCurrentValue] = useState<string>(values[currentIndex]);
-  const [currentEmail, setCurrentEmail] = useState<string>(emails[currentIndex]);
-  const [currentSubject, setCurrentSubject] = useState<string>(subjects[currentIndex]);
-  const [currentText, setCurrentText] = useState<string>(generatedTexts[currentIndex]);
-
-  function animateSlots() {
-    const totalIterations = (10 * values.length) + (currentIndex % values.length);
-    const fastIterations = 5*values.length;
-    const midIterations = fastIterations + (4*values.length);
-    const slowIterations = midIterations + values.length + (currentIndex % values.length);
-    var currentIteration = 0;
-
-    function updateVal() {
-      
-      if (currentIteration < fastIterations) {
-        currentIteration += 1;
-        setCurrentValue(values[currentIteration % values.length])
-        setTimeout(() => {
-          updateVal();
-        }, 10)
-      } else if (currentIteration < midIterations) {
-        currentIteration += 1;
-        setCurrentValue(values[currentIteration % values.length])
-        setTimeout(() => {
-          updateVal();
-        }, 30)
-      } else if (currentIteration <= slowIterations) {
-        currentIteration += 1;
-        setCurrentValue(values[currentIteration % values.length])
-        setTimeout(() => {
-          updateVal()
-        }, 70)
-      } else {
-        setCurrentEmail(emails[currentIteration % emails.length]);
-        setCurrentSubject(subjects[currentIteration % subjects.length]);
-        setCurrentText(generatedTexts[currentIteration % generatedTexts.length]);
-        return;
-      }
-    }
-    
-    updateVal();
-    currentIndex+=1;
-  }
-
-  useEffect(() => {
-    const interval = setInterval(animateSlots, 6000);
-    return () => clearInterval(interval);
-}, []);
-
-  let [authUri, setAuthUri] = useState("/signin");
+function mobileView(authUri: string, currentValue: string, currentEmail: string, currentSubject: string, currentText: string) {
 
   function handleRedirect() {
     window.location.href = authUri;
   }
 
-  useEffect(() => {
-    window.onload = async function () {
-      const jwt = Cookies.get("coldDinoJwt");
+  return (
+    <div className="w-full h-full">
+      {/* navbar */}
+      <div className="h-[60px] w-full bg-white p-[10px] flex justify-between items-center">
+        <div className="h-full flex items-center">
+          <Image
+            src="/logo.svg"
+            height={40}
+            width={40}
+            alt="logo"
+          />
+          <p className="text-[#121212] font-semibold text-2xl ml-[10px]">ColdDino</p>
+        </div>
+        <div className="w-[150px] h-full pl-[15px] pr-[15px] flex justify-center items-center text-white bg-black font-medium rounded-md hover:cursor-pointer" onClick={handleRedirect}>
+          <p>Get Started</p>
+        </div>
+      </div>
+      <div className="w-full p-[10px] pt-[44px]">
+        <div className="w-full flex justify-center"><p className="text-3xl font-[300]" style={{fontFamily: "Poppins"}}>Use AI to <span className="bg-linear-to-r from-cyan-500 to-green-500 bg-clip-text text-transparent">Personalize</span></p></div>
+        <div className="w-full flex justify-center"><p className="text-2xl font-[300]" style={{fontFamily: "Poppins"}}>Your Cold Emails To</p></div>
+        <div className="w-full flex justify-center"><p className="text-3xl font-[300]" style={{fontFamily: "Poppins"}}><span id="slots" className="bg-linear-to-r from-green-500 to-cyan-500 bg-clip-text text-transparent">{currentValue}</span></p></div>
+        <p className="text-transparent select-none font-[300]" style={{fontFamily: "Poppins"}}>tastyBakedCookies.comm</p>
+      </div>
+      {/* demo mail */}
+      <div className="w-full h-[150vw] p-[10px]">
+        <div className="bg-blue-100 w-full h-[45px] rounded-t-md flex justify-between">
+          <div className="p-[10px] flex items-center font-medium"><p className="text-black">New Message</p></div>
+          <div className="p-[10px] flex justify-between w-[120px]">
+            <Image 
+              src="/underline.svg"
+              width={15}
+              height={20}
+              style={{objectFit: "contain"}}
+              alt="underline"
+            />
+            <Image 
+              src="/expand.svg"
+              width={15}
+              height={20}
+              style={{objectFit: "contain"}}
+              alt="underline"
+            />
+            <Image 
+              src="/cross.svg"
+              width={20}
+              height={20}
+              style={{objectFit: "contain"}}
+              alt="underline"
+            />
+          </div>
+        </div>
+        <div className="h-[calc(100%-90px)] bg-white w-full overflow-y-scroll">
+          <div className="w-full p-[15px] ">
+            <p className="text-[#1a1919] font-thin text-sm">{currentEmail}</p>
+            <div className="mt-[5px] mb-[5px] w-full h-px border-t-1"></div>
+            <p className="text-[#1a1919] font-thin text-sm mt-[10px]">{currentSubject}</p>
+            <div className="mt-[5px] mb-[5px] w-full h-px border-t-1"></div>
 
-      if (jwt === undefined || jwt === null) {
-        return;
-      }
+            <p className="text-[#1a1919] font-thin text-sm mt-[10px] text-wrap">Respected Sir/Ma'am,</p>
+            <div className="h-[10px]"></div>
+            <p className="text-[#1a1919] font-thin text-sm text-wrap">I am Abhishek, full stack freelance developer currently in my second year of college. More information about my experience and techstack is available in my <a className="text-[#15c] underline">portfolio</a>.</p>
+            <div className="h-[10px]"></div>
+            <p className="text-transparent font-thin text-sm text-wrap bg-linear-to-r from-cyan-700 to-green-800 bg-clip-text">{currentText}</p>
+            <div className="h-[10px]"></div>
+            <p className="text-[#1a1919] font-thin text-sm text-wrap">I am writing this mail to show my interest in working with your company, either part time as a freelancer, or fulltime as an intern. I have also attached my resume below for your reference</p>
+            <div className="h-[10px]"></div>
+            <p className="text-[#1a1919] font-thin text-sm text-wrap">Looking forwards to connecting with you,</p>
+            <p className="text-[#1a1919] font-thin text-sm text-wrap">Abhishek</p>
+          </div>
+        </div>
+        <div className="h-[45px] w-full flex justify-between items-center bg-white rounded-b-md">
+          <div className="ml-[10px] w-[100px] h-[80%] bg-blue-500 rounded-[20px] flex justify-center items-center">
+            <p className="text-white">Send</p>
+          </div>
+          <Image
+            src="/dustbin.svg"
+            height={25}
+            width={25}
+            alt="bin"
+            className="mr-[10px]"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
 
-      try {
-        await axios.post("/api/verify", {"token": jwt});
-        
-        setAuthUri("/dashboard/generate");
-      } catch {
-        return
-      }
-    }
-
-  }, [])
+function desktopView(authUri: string, currentValue: string, currentEmail: string, currentSubject: string, currentText: string) {
+  
+  function handleRedirect() {
+    window.location.href = authUri;
+  }
 
   return (
     <div className="h-full w-full select-none">
@@ -267,28 +269,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {/* <div className="w-full lg:h-[300px] bg-zinc-300 pt-[30px] flex justify-around items-center">
-        <div className="h-full w-[95%] flex items-center justify-between flex-col lg:flex-row">
-          <div className="w-full lg:w-[30%] lg:h-[90%] flex flex-col items-center">
-            <p className="text-black text-2xl text-center font-bold">Automate Email Personalization</p>
-            <br />
-            <p className="text-[#121212] text-xl text-left">Even though you may know what the company does, it might be hard for you to put into perspective why you want to be working with them, and while cold mailing multiple companies, its easy to loose track.</p>
-          </div>
-          <div className="w-[90%] h-[1px] lg:w-[1px] lg:h-[90%] border-[#121212] border-t-1 border-b-1 mt-[20px] mb-[20px] lg:border-r-1 lg:border-l-1 lg:border-t-0 lg:border-b-0 lg:mr-[20px] lg:ml-[20px]"></div>
-          <div className="w-full lg:w-[30%] lg:h-[90%] flex flex-col grow-1  items-center">
-            <p className="text-black text-2xl text-center font-bold">Send emails straight from the site</p>
-            <br />
-            <p className="text-[#121212] text-xl text-left">You can send the emails after they have been generated straight from this site! No need to copy the message and send it from your mailbox, or you can save it in your drafts.</p>
-          </div>
-          <div className="w-[90%] h-[1px] lg:w-[1px] lg:h-[90%] border-[#121212] border-t-1 border-b-1 mt-[20px] mb-[20px] lg:border-r-1 lg:border-l-1 lg:border-t-0 lg:border-b-0 lg:mr-[20px] lg:ml-[20px]"></div>
-          <div className="w-full lg:w-[30%] lg:h-[90%] grow-1 flex flex-col items-center">
-            <p className="text-black text-2xl text-center font-bold">Send emails in batches</p>
-            <br />
-            <p className="text-[#121212] text-xl text-left">Instead of sending the emails one at a time, you can upload a CSV file containing upto 20 emails of contacts that you wish to send cold emails to. The app will automatically parse them! (Coming soon)</p>
-          </div>  
-        </div>
-      </div> */}
-
       <div className="h-full w-full flex" id="features">
         <div className="w-[30%] h-full bg-white flex flex-col justify-center items-center">
           <p className="text-[#121212] text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>WHAT</p>
@@ -315,4 +295,108 @@ export default function Home() {
       </div>
     </div>
   );
+}
+
+export default function Home() {
+  let [authUri, setAuthUri] = useState("/signin");
+
+  const values = ["coolCoffeeStartup.com", "greatIndianBirds.in", "tastyBakedCookies.com", "crazyCandies.org", "fabulousFintech.com", "amazingAerospace.com", "poshPublishers.com"];
+  const emails = ["hr@coolCoffeeStartup.com", "people@greatIndianBirds.in", "natasha@tastyBakedCookies.com", "cook@crazyCandies.org", "cto@fabulousFintech.com", "kevin@amazingAerospace.com", "editor@poshPublishers.com"]
+  const subjects = [
+    "Eager to work with coolCoffeeStartup",
+    "Looking for opportunities at greatIndianBirds",
+    "Looking for freelance work at tastyBakedCookies",
+    "Seeking opportunities at crazyCandies",
+    "Want to contribute to fabulousFintech",
+    "Interested in working with amazingAerospace", 
+    "Website development services for poshPublishers"
+  ];
+  const generatedTexts = [
+    "I have been a coffee enthusiast all my life. My days usually start with coffee, and if they dont my day doesnt go well. I really like what your company is doing with regards to coffee.",
+    "As an avid bird watcher, and someone who has been interested in birds since a very young age, I am deeply impressed by what your company does.",
+    "Baking has been a hobby of mine since childhood, it has been one of the few things that I enjoy thoroughly. I have been following your company for a while and I really like the quality of your products.",
+    "I have been following your company for a long time, and have been consuming your products for the same. The quality of your products never ceases to amaze me.",
+    "As someone who has always been interested in finance and fintech, your company really amazes me. The work that your company is doing in the domain is revolutionary.",
+    "Ever since I was young, I have had an interest in aerospace. Everything about aeronautics and space amazes me. The work that your company is doing in this domain is amazing.",
+    "I have always had a keen interest in reading books, they have been a source of extreme joy and knowledge for me. Because of this, I hold special connection to your publishing house."
+  ]
+  
+  var currentIndex = 0;
+  const [currentValue, setCurrentValue] = useState<string>(values[currentIndex]);
+  const [currentEmail, setCurrentEmail] = useState<string>(emails[currentIndex]);
+  const [currentSubject, setCurrentSubject] = useState<string>(subjects[currentIndex]);
+  const [currentText, setCurrentText] = useState<string>(generatedTexts[currentIndex]);
+
+  function animateSlots() {
+    const totalIterations = (10 * values.length) + (currentIndex % values.length);
+    const fastIterations = 5*values.length;
+    const midIterations = fastIterations + (4*values.length);
+    const slowIterations = midIterations + values.length + (currentIndex % values.length);
+    var currentIteration = 0;
+
+    function updateVal() {
+      
+      if (currentIteration < fastIterations) {
+        currentIteration += 1;
+        setCurrentValue(values[currentIteration % values.length])
+        setTimeout(() => {
+          updateVal();
+        }, 10)
+      } else if (currentIteration < midIterations) {
+        currentIteration += 1;
+        setCurrentValue(values[currentIteration % values.length])
+        setTimeout(() => {
+          updateVal();
+        }, 30)
+      } else if (currentIteration <= slowIterations) {
+        currentIteration += 1;
+        setCurrentValue(values[currentIteration % values.length])
+        setTimeout(() => {
+          updateVal()
+        }, 70)
+      } else {
+        setCurrentEmail(emails[currentIteration % emails.length]);
+        setCurrentSubject(subjects[currentIteration % subjects.length]);
+        setCurrentText(generatedTexts[currentIteration % generatedTexts.length]);
+        return;
+      }
+    }
+    
+    updateVal();
+    currentIndex+=1;
+  }
+
+  useEffect(() => {
+    const interval = setInterval(animateSlots, 6000);
+    return () => clearInterval(interval);
+}, []);
+
+  useEffect(() => {
+    window.onload = async function () {
+      const jwt = Cookies.get("coldDinoJwt");
+
+      if (jwt === undefined || jwt === null) {
+        return;
+      }
+
+      try {
+        await axios.post("/api/verify", {"token": jwt});
+        
+        setAuthUri("/dashboard/generate");
+      } catch {
+        return
+      }
+    }
+
+  }, [])
+  return (
+    <div className="w-full h-full">
+      <div className="w-full h-full hidden mbp:block">
+        {desktopView(authUri, currentValue, currentEmail, currentSubject, currentText)}
+      </div>
+      <div className="w-full h-full block mbp:hidden">
+        {mobileView(authUri, currentValue, currentEmail, currentSubject, currentText)}
+      </div>
+    </div>
+  )
 }
