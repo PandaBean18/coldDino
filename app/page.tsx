@@ -84,21 +84,21 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
         </div>
         <div className="h-[calc(100%-90px)] bg-white w-full overflow-y-scroll">
           <div className="w-full p-[15px] ">
-            <p className="text-[#1a1919] font-thin text-sm">{currentEmail}</p>
+            <p className="text-[#1a1919] text-sm">{currentEmail}</p>
             <div className="mt-[5px] mb-[5px] w-full h-px border-t-1"></div>
-            <p className="text-[#1a1919] font-thin text-sm mt-[10px]">{currentSubject}</p>
+            <p className="text-[#1a1919] text-sm mt-[10px]">{currentSubject}</p>
             <div className="mt-[5px] mb-[5px] w-full h-px border-t-1"></div>
 
-            <p className="text-[#1a1919] font-thin text-sm mt-[10px] text-wrap">Respected Sir/Ma'am,</p>
+            <p className="text-[#1a1919] text-sm mt-[10px] text-wrap">Respected Sir/Ma'am,</p>
             <div className="h-[10px]"></div>
-            <p className="text-[#1a1919] font-thin text-sm text-wrap">I am Abhishek, full stack freelance developer currently in my second year of college. More information about my experience and techstack is available in my <a className="text-[#15c] underline">portfolio</a>.</p>
+            <p className="text-[#1a1919] text-sm text-wrap">I am Abhishek, full stack freelance developer currently in my second year of college. More information about my experience and techstack is available in my <a className="text-[#15c] underline">portfolio</a>.</p>
             <div className="h-[10px]"></div>
-            <p className="text-transparent font-thin text-sm text-wrap bg-linear-to-r from-cyan-700 to-green-800 bg-clip-text">{currentText}</p>
+            <p className="text-transparent text-sm text-wrap bg-linear-to-r from-cyan-700 to-green-800 bg-clip-text">{currentText}</p>
             <div className="h-[10px]"></div>
-            <p className="text-[#1a1919] font-thin text-sm text-wrap">I am writing this mail to show my interest in working with your company, either part time as a freelancer, or fulltime as an intern. I have also attached my resume below for your reference</p>
+            <p className="text-[#1a1919] text-sm text-wrap">I am writing this mail to show my interest in working with your company, either part time as a freelancer, or fulltime as an intern. I have also attached my resume below for your reference</p>
             <div className="h-[10px]"></div>
-            <p className="text-[#1a1919] font-thin text-sm text-wrap">Looking forwards to connecting with you,</p>
-            <p className="text-[#1a1919] font-thin text-sm text-wrap">Abhishek</p>
+            <p className="text-[#1a1919] text-sm text-wrap">Looking forwards to connecting with you,</p>
+            <p className="text-[#1a1919] text-sm text-wrap">Abhishek</p>
           </div>
         </div>
         <div className="h-[45px] w-full flex justify-between items-center bg-white rounded-b-md">
@@ -112,6 +112,64 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
             alt="bin"
             className="mr-[10px]"
           />
+        </div>
+      </div>
+      {/* Features */}
+      <div className="w-full p-[10px]">
+        <div className="w-full min-h-[100px] flex items-center border-b-5 border-[#121212]">
+          <div className="w-[20%] flex flex-col items-center">
+            <p className="text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>1</p>
+          </div>
+          <div className="w-[80%] min-h-[100px] bg-white flex-1 p-[10px]">
+            <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>Firstly, start by creating an email template. This is the email that will be sent to your cold contacts.</p>
+          </div>
+        </div>
+        <div className="w-full min-h-[100px] flex items-center border-b-5 border-[#121212] border-t-5 border-[#121212]">
+          <div className="w-[80%] min-h-[100px] bg-white flex-1 p-[10px]">
+            <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>After this, just move to our generate content tab, and type in the email of the person you wish to contact. Make sure to keep their email ID in the user@domainName.com format.</p>
+          </div>
+          <div className="w-[20%] h-full min-h-[100px] flex flex-col items-center">
+            <p className="text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>2</p>
+          </div>
+        </div>
+        <div className="w-full min-h-[100px] flex items-center border-b-5 border-[#121212] border-t-5 border-[#121212]">
+          <div className="w-[20%] flex flex-col items-center">
+            <p className="text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>3</p>
+          </div>
+          <div className="w-[80%] min-h-[100px] bg-white flex-1 p-[10px]">
+            <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>Now sit back and let our AI agent figure out what the company does and prepare a brief summary that looks just like you wrote it! The application will paste this into your template, and the email will be ready to be sent.</p>
+          </div>
+        </div>
+        <div className="w-full min-h-[100px] flex items-center border-b-5 border-[#121212] border-t-5 border-[#121212]">
+          <div className="w-[80%] min-h-[100px] bg-white flex-1 p-[10px]">
+            <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>Once done, you can proof read the email and send it directly from our app, or save it to your drafts and send it later from your mailbox.</p>
+          </div>
+          <div className="w-[20%] h-full min-h-[100px] flex flex-col items-center">
+            <p className="text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>4</p>
+          </div>
+        </div>
+      </div>
+      {/* Features */}
+      <div className="w-full">
+        <div className="w-full bg-white flex flex-col justify-center items-center p-[20px]">
+          <div className="w-full flex justify-start"><p className="text-[#121212] text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>WHAT</p></div>
+          <div className="w-full flex justify-center"><p className="text-[#121212] text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>DO WE<span className="text-transparent">R.</span></p></div>
+          <div className="w-full flex justify-end"><p className="text-[#121212] text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>OFFER?</p></div>
+        </div>
+        <div className="w-full bg-black p-[20px] flex flex-col justify-center">
+          <p className="text-white text-3xl font-bold" style={{fontFamily: "Bebas Neue"}}>Automated Email Personalization</p>
+          <br />
+          <p className="text-white text-xl" style={{fontFamily: "Poppins"}}>Even though you may know what the company does, it might be hard for you to put into perspective why you want to be working with them, and while cold mailing multiple companies, its easy to loose track.</p>
+        </div>
+        <div className="w-full bg-white p-[20px] flex flex-col justify-center border-l-1">
+          <p className="text-[#121212] text-3xl font-bold" style={{fontFamily: "Bebas Neue"}}>Sending emails straight from the site</p>
+          <br />
+          <p className="text-[#121212] text-xl" style={{fontFamily: "Poppins"}}>You can send the emails after they have been generated straight from this site. No need to copy the message and send it from your mailbox, or you can save it in your drafts.</p>
+        </div>
+        <div className="w-full bg-black p-[20px] flex flex-col justify-center">
+          <p className="text-white text-3xl font-bold" style={{fontFamily: "Bebas Neue"}}>Send emails in batches</p>
+          <br />
+          <p className="text-white text-xl" style={{fontFamily: "Poppins"}}>Instead of sending the emails one at a time, you can upload a CSV file containing upto 20 emails of contacts that you wish to send cold emails to. The app will automatically parse them.</p>
         </div>
       </div>
     </div>
