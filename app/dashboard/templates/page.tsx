@@ -733,7 +733,7 @@ export default function Templates() {
 
                 {/* New template */}
                     {/* <input className="h-[70px] w-full text-3xl text-[#121212] font-semibold border-zinc-200 border-0 border-b-1 focus:outline-none focus:border-zinc-500" type="text" id="newTemplateName" value={`Template ${totalTemplateCount+1}`}/> */}
-                    <div className="flex h-[700px] w-full overflow-hidden p-[10px] flex flex-col items-center justify-center">
+                    <div className="flex h-max w-full overflow-hidden p-[10px] flex flex-col items-center justify-center">
                         <div className="h-full pt-[20px] flex justify-center items-center">
                             <div className="flex flex-col justify-center items-center">
                                 <div className="rounded-[5px] border-1 border-zinc-300 p-[10px] w-full flex flex-col flex-center items-center">
