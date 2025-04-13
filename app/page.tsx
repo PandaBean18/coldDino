@@ -121,12 +121,12 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
             <p className="text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>1</p>
           </div>
           <div className="w-[80%] min-h-[100px] bg-white flex-1 p-[10px]">
-            <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>Firstly, start by creating an email template. This is the email that will be sent to your cold contacts.</p>
+            <p className="text-[#121212] text-xl" style={{fontFamily: "Bebas Neue"}}>Firstly, start by creating an email template. This is the email that will be sent to your cold contacts.</p>
           </div>
         </div>
         <div className="w-full min-h-[100px] flex items-center border-b-5 border-[#121212] border-t-5 border-[#121212]">
           <div className="w-[80%] min-h-[100px] bg-white flex-1 p-[10px]">
-            <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>After this, just move to our generate content tab, and type in the email of the person you wish to contact. Make sure to keep their email ID in the user@domainName.com format.</p>
+            <p className="text-[#121212] text-xl" style={{fontFamily: "Bebas Neue"}}>After this, just move to our generate content tab, and type in the email of the person you wish to contact. Make sure to keep their email ID in the user@domainName.com format.</p>
           </div>
           <div className="w-[20%] h-full min-h-[100px] flex flex-col items-center">
             <p className="text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>2</p>
@@ -137,12 +137,12 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
             <p className="text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>3</p>
           </div>
           <div className="w-[80%] min-h-[100px] bg-white flex-1 p-[10px]">
-            <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>Now sit back and let our AI agent figure out what the company does and prepare a brief summary that looks just like you wrote it! The application will paste this into your template, and the email will be ready to be sent.</p>
+            <p className="text-[#121212] text-xl" style={{fontFamily: "Bebas Neue"}}>Now sit back and let our AI agent figure out what the company does and prepare a brief summary that looks just like you wrote it! The application will paste this into your template, and the email will be ready to be sent.</p>
           </div>
         </div>
         <div className="w-full min-h-[100px] flex items-center border-b-5 border-[#121212] border-t-5 border-[#121212]">
           <div className="w-[80%] min-h-[100px] bg-white flex-1 p-[10px]">
-            <p className="text-[#121212] text-2xl" style={{fontFamily: "Bebas Neue"}}>Once done, you can proof read the email and send it directly from our app, or save it to your drafts and send it later from your mailbox.</p>
+            <p className="text-[#121212] text-xl" style={{fontFamily: "Bebas Neue"}}>Once done, you can proof read the email and send it directly from our app, or save it to your drafts and send it later from your mailbox.</p>
           </div>
           <div className="w-[20%] h-full min-h-[100px] flex flex-col items-center">
             <p className="text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>4</p>
