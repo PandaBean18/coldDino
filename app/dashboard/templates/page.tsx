@@ -680,7 +680,7 @@ export default function Templates() {
             <div className="w-full h-full">
                 {/* navbar */}
                 <div className="w-full h-[60px] bg-white flex items-center p-[10px] border-b-1 border-slate-200">
-                    <div className="w-full h-[60px] z-0 flex justify-center items-center absolute top-0">
+                    <div className="w-full h-[60px] z-0 flex justify-center items-center absolute top-0 left-0">
                         <p className="text-[#121212] text-2xl font-bold ml-[10px]">New Template</p>
                     </div>
                     <div className="w-[40px] h-[40px] relative" onClick={toggleSidebarMobile}>
@@ -850,6 +850,7 @@ export default function Templates() {
                                         />
                                     </div>
                                 </div>
+                                <br />
                             </div>
                             
                         </div>
