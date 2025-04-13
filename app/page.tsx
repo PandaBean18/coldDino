@@ -55,7 +55,7 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
         <p className="text-transparent select-none font-[300]" style={{fontFamily: "Poppins"}}>tastyBakedCookies.comm</p>
       </div>
       {/* demo mail */}
-      <div className="w-full h-[150vw] p-[10px]">
+      <div className="w-full h-[150vw] p-[10px] max-h-[500px] max-w-[500px]">
         <div className="bg-blue-100 w-full h-[45px] rounded-t-md flex justify-between">
           <div className="p-[10px] flex items-center font-medium"><p className="text-black">New Message</p></div>
           <div className="p-[10px] flex justify-between w-[120px]">
