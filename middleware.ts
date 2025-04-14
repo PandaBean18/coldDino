@@ -10,19 +10,16 @@ export async function middleware(req: NextRequest) {
         const jwt = cookieStore.get("coldDinoJwt");
 
         if (jwt === undefined) {
-            console.log("no jwt");
             return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/signin`);
         }
   
         try {
             await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/api/verify`, {"token": jwt.value});
         } catch (error) {
-            console.log("invalid jwt: ", jwt);
             return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/signin`);
         }
 
         const gmailTokens = cookieStore.get("gmail_tokens");
-        console.log(gmailTokens)
         if (gmailTokens === undefined) {
             return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/signin/allow`);
         }

@@ -45,7 +45,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (typeof(v) !== "string") {
                 res.status(200).json({"message": "valid token", "expiry": v.exp})
             } else {
-                console.log("failure")
                 res.status(401).json({"message": "invalid token"})
             }
         } catch {

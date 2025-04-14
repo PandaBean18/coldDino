@@ -55,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         const cookieStore = req.cookies;
         const tokenData = cookieStore["gmail_tokens"];
-        console.log(tokenData);
+
         if (tokenData) {
             try {
                 const tokens: GoogleTokens = JSON.parse(tokenData.toString()) as GoogleTokens;
