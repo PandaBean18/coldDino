@@ -38,7 +38,7 @@ interface InvdividualTemplate {
     message: string,
 }
 
-export default function Templates(req: NextApiRequest, res: NextApiResponse) {
+export default function Templates() {
     let navBarImage: string = "/hamburger.svg"
     let [totalTemplateCount, setTotalTemplateCount] = useState(0);
     const [newTemplateName, setNewTemplateName] = useState(`Template ${totalTemplateCount+1}`)
