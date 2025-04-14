@@ -113,9 +113,20 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
             className="mr-[10px]"
           />
         </div>
+        <br />
+        <div className="flex justify-center items-center hover:cursor-pointer" onClick={()=>{window.location.href = "/waitlist"}}>
+          <p className="text-4xl font-[500]" style={{fontFamily: "Bebas Neue"}}>Join The Waitlist</p>
+          <div className="w-[20px]"></div>
+          <Image
+            src="/arrow_white.svg"
+            height={30}
+            width={30}
+            alt="arrow"
+          />
+        </div>
       </div>
-      {/* Features */}
-      <div className="w-full p-[10px]">
+      {/* How it works */}
+      <div className="w-full p-[10px] mt-[75px]">
         <div className="w-full min-h-[100px] flex items-center border-b-5 border-[#121212]">
           <div className="w-[20%] flex flex-col items-center">
             <p className="text-7xl font-bold" style={{fontFamily: "Bebas Neue"}}>1</p>
@@ -198,7 +209,7 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
         <div className="flex justify-between h-full w-fit items-center">
           <div className="justify-evenly hidden sm:flex">
             <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{document.getElementById("features")?.scrollIntoView({behavior: "smooth"})}}>Features</p></div>
-            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer">Pricing</p></div>
+            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/waitlist"}}>Waitlist</p></div>
             <div className="p-[5px] pr-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={handleRedirect}>Login</p></div>
           </div>
           <div className="ml-[10px] h-[70%] pl-[15px] pr-[15px] flex justify-center items-center text-white bg-black font-medium rounded-md hover:cursor-pointer mr-[20px]" onClick={handleRedirect}>
@@ -214,7 +225,18 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
               <p style={{fontFamily: "Poppins"}}>Your Cold Emails To</p>
               <p style={{fontFamily: "Poppins"}}><span id="slots" className="bg-linear-to-r from-green-500 to-cyan-500 bg-clip-text text-transparent">{currentValue}</span></p>
               <p className="text-transparent select-none font-[300]" style={{fontFamily: "Poppins"}}>tastyBakedCookies.comm</p>
+              <div className="flex justify-start items-center hover:cursor-pointer" onClick={()=>{window.location.href = "/waitlist"}}>
+                <p className="text-5xl font-[500]" style={{fontFamily: "Bebas Neue"}}>Join The Waitlist</p>
+                <div className="w-[20px]"></div>
+                <Image
+                  src="/arrow_white.svg"
+                  height={50}
+                  width={50}
+                  alt="arrow"
+                />
+              </div>
             </div>
+            
           </div>
         </div>
         <div className="w-[95vw] h-[80%] flex flex-col mbp:flex-row mbp:h-full p-[15px] mbp:justify-around mbp:w-[450px] mbp:items-center items-center">
