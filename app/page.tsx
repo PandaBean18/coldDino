@@ -378,7 +378,7 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
 }
 
 export default function Home() {
-  let [authUri, setAuthUri] = useState("/signin");
+  let [authUri, setAuthUri] = useState("/waitlist");
 
   const values = ["coolCoffeeStartup.com", "greatIndianBirds.in", "tastyBakedCookies.com", "crazyCandies.org", "fabulousFintech.com", "amazingAerospace.com", "poshPublishers.com"];
   const emails = ["hr@coolCoffeeStartup.com", "people@greatIndianBirds.in", "natasha@tastyBakedCookies.com", "cook@crazyCandies.org", "cto@fabulousFintech.com", "kevin@amazingAerospace.com", "editor@poshPublishers.com"]
@@ -462,7 +462,7 @@ export default function Home() {
       try {
         await axios.post("/api/verify", {"token": jwt});
         
-        setAuthUri("/dashboard/generate");
+        //setAuthUri("/dashboard/generate");
       } catch {
         return
       }
