@@ -63,17 +63,17 @@ export default function Templates() {
     }
 
     useEffect(() => {
-    const handleLoad = () => {
-        setTimeout(populateTemplates, 100);
-    };
+        const handleLoad = () => {
+            setTimeout(populateTemplates, 100);
+        };
 
-    if (document.readyState === 'complete') {
-        handleLoad();
-    } else {
-        window.addEventListener('load', handleLoad);
-    }
+        if (document.readyState === 'complete') {
+            handleLoad();
+        } else {
+            window.addEventListener('load', handleLoad);
+        }
 
-    return () => window.removeEventListener('load', handleLoad);
+        return () => window.removeEventListener('load', handleLoad);
     }, []);
     
 
@@ -698,6 +698,17 @@ export default function Templates() {
                 </div>
                 {/* sidebar */}
                 <div className="h-[calc(100%-60px)] w-[0%] bg-zinc-100 absolute top-[60px] overflow-hidden duration-150 flex flex-col items-center z-100" id="sidebarMobile">
+                    <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] hover:cursor-pointer" onClick={()=>{window.location.href = "/"}}>
+                        <div className="flex items-center">
+                            <Image
+                                src="/home.svg"
+                                height={25}
+                                width={25}
+                                alt="ai"
+                            />
+                            <p className="text-[#121212] text-xl font-normal ml-[10px]">Homepage</p>
+                        </div>
+                    </div>
                     <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] hover:cursor-pointer">
                         <div className="flex items-center">
                             <Image
@@ -1500,7 +1511,18 @@ export default function Templates() {
                             <p className="text-[#121212] text-2xl font-bold ml-[10px]">Dashboard</p>
                         </div>
                         <div className="h-[calc(100%-140px)] w-full flex flex-col items-center">
-                            <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] duration-100 ease-in-out hover:cursor-pointer" onClick={toggleDrafts}>
+                        <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] hover:cursor-pointer">
+                                <div className="flex items-center">
+                                    <Image
+                                        src="/home.svg"
+                                        height={25}
+                                        width={25}
+                                        alt="home"
+                                    />
+                                    <p className="text-[#121212] font-normal ml-[10px]">Homepage</p>
+                                </div>
+                            </div>
+                            <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] duration-100 ease-in-out hover:cursor-pointer">
                                 <div className="flex items-center">
                                     <Image
                                         src="/mail_draft.svg"
@@ -1510,29 +1532,7 @@ export default function Templates() {
                                     />
                                     <p className="text-[#121212] font-normal ml-[10px]">Email Templates</p>
                                 </div>
-                                <div className="flex items-center justify-center">
-                                    <Image 
-                                        src="/down.svg"
-                                        height={20}
-                                        width={20}
-                                        alt="down"
-                                        className="duration-100 ease-in-out transform-[rotate(0deg)]"
-                                        id="downImage"
-                                    />
-                                </div>
-                            </div>
-                            
-                            <div className="w-[70%] p-[0px] rounded-[5px] flex flex-col justify-center items-center duration-100 h-0 bg-slate-200 overflow-hidden" id="templateList">
-                                <div className="template w-full hover:cursor-pointer">
-                                    <p className="text-[#121212]">Template 1</p>
-                                </div>
-                                <div className="w-full border-b-1 border-zinc-500 mt-[10px] mb-[10px]"></div>
-                                <div className="template w-full hover:cursor-pointer">
-                                    <p className="text-[#121212]" >Template 2</p>
-                                </div>
-                                <div className="w-[80%] h-[35px] bg-[#121212] rounded-[2.5px] mt-[10px] flex justify-center items-center hover:cursor-pointer">
-                                    <p className="text-zinc-100">New Template</p>
-                                </div>
+                                
                             </div>
                             <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] hover:cursor-pointer">
                                 <div className="flex items-center">
