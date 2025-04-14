@@ -47,7 +47,7 @@ export default function Signin() {
             let token = payload.credential;
             try {
                 const response = await axios.post("/api/verify", {"token": token});
-                
+                Cookies.remove("coldDinoJwt");
                 Cookies.set("coldDinoJwt", token, {expires: 10});
 
                 const gmailAuthCookie: string | undefined = Cookies.get("gmail_tokens");

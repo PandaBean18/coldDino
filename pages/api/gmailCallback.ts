@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
           });
       
-          setCookie("gmail_tokens", JSON.stringify({
+          await setCookie("gmail_tokens", JSON.stringify({
             access_token: response.data.access_token,
             refresh_token: response.data.refresh_token,
             expires_in: Date.now() + (response.data.expires_in * 1000),
@@ -35,8 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             sameSite: "strict",
             maxAge: response.data.expires_in
           });
-      
-          res.redirect(`${process.env.NEXT_PUBLIC_BASE_URL!}/dashboard/generate`);
+  
+          res.redirect(`${process.env.NEXT_PUBLIC_BASE_URL!}/signin/redirect`);
     } catch (error) {
         console.log("OAuth callback error:", error);
         res.status(500).json({ message: "Authentication failed" });

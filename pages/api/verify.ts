@@ -43,7 +43,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             let v = verify(token, publicKey, {algorithms: ["RS256"]});
 
             if (typeof(v) !== "string") {
-                console.log(v.exp);
                 res.status(200).json({"message": "valid token", "expiry": v.exp})
             } else {
                 console.log("failure")

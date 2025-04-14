@@ -3,7 +3,9 @@ import Image from "next/image"
 import { ChangeEvent, Dispatch, SetStateAction, useEffect } from "react";
 import { useState } from "react";
 import Cookies from "js-cookie"
-
+import axios from "axios";
+import { NextApiRequest, NextApiResponse, Redirect } from "next";
+import { redirect } from "next/dist/server/api-utils";
 
 declare global {
     interface HTMLElement {
@@ -36,7 +38,7 @@ interface InvdividualTemplate {
     message: string,
 }
 
-export default function Templates() {
+export default function Templates(req: NextApiRequest, res: NextApiResponse) {
     let navBarImage: string = "/hamburger.svg"
     let [totalTemplateCount, setTotalTemplateCount] = useState(0);
     const [newTemplateName, setNewTemplateName] = useState(`Template ${totalTemplateCount+1}`)

@@ -1,6 +1,8 @@
+"use server"
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { getCookie, setCookie } from "cookies-next";
+import { cookies } from "next/headers";
 
 interface GoogleTokens {
     access_token: string;
@@ -49,14 +51,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method !== "POST") {
         return res.status(405).json({ message: "Method not allowed" });
     }
-
+    
     try {
-        const tokenData = await getCookie("gmail_tokens", { req, res });
-
+        const cookieStore = req.cookies;
+        const tokenData = cookieStore["gmail_tokens"];
+        console.log(tokenData);
         if (tokenData) {
             try {
                 const tokens: GoogleTokens = JSON.parse(tokenData.toString()) as GoogleTokens;
-                console.log(tokens)
                 if (Date.now() >  tokens.expires_in * 1000) {
                     await refreshAccessToken(tokens.refresh_token, tokens, req, res);                    
                 }
