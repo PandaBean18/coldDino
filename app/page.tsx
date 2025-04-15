@@ -219,7 +219,7 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
           </div>
         </div>
       </div>
-      <div className="w-full h-[calc(100vh-50px)] h-[100vw] max-mbp:h-[calc(100vh-75px)] bg-black mbp:flex mbp:pt-0 mbp:pb-0 pt-[40px] pb-[40px]">
+      <div className="w-full h-[calc(100vh-50px)] max-h-[100vw] mbp:h-[calc(100vh-75px)] bg-black mbp:flex mbp:pt-0 mbp:pb-0 pt-[40px] pb-[40px]">
         <div className="w-full mbp:h-full flex flex-col justify-around mbp:w-[calc(100vw*0.5)]">
           <div className="topText w-full flex flex-col items-center">
             <div className="text-3xl font-[300] mbp:text-4xl">
