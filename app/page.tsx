@@ -55,74 +55,76 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
         <p className="text-transparent select-none font-[300]" style={{fontFamily: "Poppins"}}>tastyBakedCookies.comm</p>
       </div>
       {/* demo mail */}
-      <div className="w-full h-[150vw] p-[10px] max-h-[500px] max-w-[500px]">
-        <div className="bg-blue-100 w-full h-[45px] rounded-t-md flex justify-between">
-          <div className="p-[10px] flex items-center font-medium"><p className="text-black">New Message</p></div>
-          <div className="p-[10px] flex justify-between w-[120px]">
-            <Image 
-              src="/underline.svg"
-              width={15}
-              height={20}
-              style={{objectFit: "contain"}}
-              alt="underline"
-            />
-            <Image 
-              src="/expand.svg"
-              width={15}
-              height={20}
-              style={{objectFit: "contain"}}
-              alt="underline"
-            />
-            <Image 
-              src="/cross.svg"
-              width={20}
-              height={20}
-              style={{objectFit: "contain"}}
-              alt="underline"
-            />
+      <div className="w-full h-[150vw] max-h-[500px] flex flex-col items-center justify-center">
+        <div className="w-full h-full p-[10px] max-h-[500px] max-w-[500px]">
+          <div className="bg-blue-100 w-full h-[45px] rounded-t-md flex justify-between">
+            <div className="p-[10px] flex items-center font-medium"><p className="text-black">New Message</p></div>
+            <div className="p-[10px] flex justify-between w-[120px]">
+              <Image 
+                src="/underline.svg"
+                width={15}
+                height={20}
+                style={{objectFit: "contain"}}
+                alt="underline"
+              />
+              <Image 
+                src="/expand.svg"
+                width={15}
+                height={20}
+                style={{objectFit: "contain"}}
+                alt="underline"
+              />
+              <Image 
+                src="/cross.svg"
+                width={20}
+                height={20}
+                style={{objectFit: "contain"}}
+                alt="underline"
+              />
+            </div>
           </div>
-        </div>
-        <div className="h-[calc(100%-90px)] bg-white w-full overflow-y-scroll">
-          <div className="w-full p-[15px] ">
-            <p className="text-[#1a1919] text-sm">{currentEmail}</p>
-            <div className="mt-[5px] mb-[5px] w-full h-px border-t-1"></div>
-            <p className="text-[#1a1919] text-sm mt-[10px]">{currentSubject}</p>
-            <div className="mt-[5px] mb-[5px] w-full h-px border-t-1"></div>
+          <div className="h-[calc(100%-90px)] bg-white w-full overflow-y-hidden">
+            <div className="w-full p-[15px] ">
+              <p className="text-[#1a1919] text-sm">{currentEmail}</p>
+              <div className="mt-[5px] mb-[5px] w-full h-px border-t-1"></div>
+              <p className="text-[#1a1919] text-sm mt-[10px]">{currentSubject}</p>
+              <div className="mt-[5px] mb-[5px] w-full h-px border-t-1"></div>
 
-            <p className="text-[#1a1919] text-sm mt-[10px] text-wrap">Respected Sir/Ma'am,</p>
-            <div className="h-[10px]"></div>
-            <p className="text-[#1a1919] text-sm text-wrap">I am Abhishek, full stack freelance developer currently in my second year of college. More information about my experience and techstack is available in my <a className="text-[#15c] underline">portfolio</a>.</p>
-            <div className="h-[10px]"></div>
-            <p className="text-transparent text-sm text-wrap bg-linear-to-r from-cyan-700 to-green-800 bg-clip-text">{currentText}</p>
-            <div className="h-[10px]"></div>
-            <p className="text-[#1a1919] text-sm text-wrap">I am writing this mail to show my interest in working with your company, either part time as a freelancer, or fulltime as an intern. I have also attached my resume below for your reference</p>
-            <div className="h-[10px]"></div>
-            <p className="text-[#1a1919] text-sm text-wrap">Looking forwards to connecting with you,</p>
-            <p className="text-[#1a1919] text-sm text-wrap">Abhishek</p>
+              <p className="text-[#1a1919] text-sm mt-[10px] text-wrap">Respected Sir/Ma'am,</p>
+              <div className="h-[10px]"></div>
+              <p className="text-[#1a1919] text-sm text-wrap">I am Abhishek, full stack freelance developer currently in my second year of college. More information about my experience and techstack is available in my <a className="text-[#15c] underline">portfolio</a>.</p>
+              <div className="h-[10px]"></div>
+              <p className="text-transparent text-sm text-wrap bg-linear-to-r from-cyan-700 to-green-800 bg-clip-text">{currentText}</p>
+              <div className="h-[10px]"></div>
+              <p className="text-[#1a1919] text-sm text-wrap">I am writing this mail to show my interest in working with your company, either part time as a freelancer, or fulltime as an intern. I have also attached my resume below for your reference</p>
+              <div className="h-[10px]"></div>
+              <p className="text-[#1a1919] text-sm text-wrap">Looking forwards to connecting with you,</p>
+              <p className="text-[#1a1919] text-sm text-wrap">Abhishek</p>
+            </div>
           </div>
-        </div>
-        <div className="h-[45px] w-full flex justify-between items-center bg-white rounded-b-md">
-          <div className="ml-[10px] w-[100px] h-[80%] bg-blue-500 rounded-[20px] flex justify-center items-center">
-            <p className="text-white">Send</p>
+          <div className="h-[45px] w-full flex justify-between items-center bg-white rounded-b-md">
+            <div className="ml-[10px] w-[100px] h-[80%] bg-blue-500 rounded-[20px] flex justify-center items-center">
+              <p className="text-white">Send</p>
+            </div>
+            <Image
+              src="/dustbin.svg"
+              height={25}
+              width={25}
+              alt="bin"
+              className="mr-[10px]"
+            />
           </div>
-          <Image
-            src="/dustbin.svg"
-            height={25}
-            width={25}
-            alt="bin"
-            className="mr-[10px]"
-          />
-        </div>
-        <br />
-        <div className="flex justify-center items-center hover:cursor-pointer" onClick={()=>{window.location.href = "/waitlist"}}>
-          <p className="text-4xl font-[500]" style={{fontFamily: "Bebas Neue"}}>Join The Waitlist</p>
-          <div className="w-[20px]"></div>
-          <Image
-            src="/arrow_white.svg"
-            height={30}
-            width={30}
-            alt="arrow"
-          />
+          <br />
+          <div className="flex justify-center items-center hover:cursor-pointer" onClick={()=>{window.location.href = "/waitlist"}}>
+            <p className="text-4xl font-[500]" style={{fontFamily: "Bebas Neue"}}>Join The Waitlist</p>
+            <div className="w-[20px]"></div>
+            <Image
+              src="/arrow_white.svg"
+              height={30}
+              width={30}
+              alt="arrow"
+            />
+          </div>
         </div>
       </div>
       {/* How it works */}
@@ -217,7 +219,7 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
           </div>
         </div>
       </div>
-      <div className="w-full h-[calc(100vh-50px)] mbp:h-[calc(100vh-75px)] bg-black mbp:flex mbp:pt-0 mbp:pb-0 pt-[40px] pb-[40px]">
+      <div className="w-full h-[calc(100vh-50px)] h-[100vw] max-mbp:h-[calc(100vh-75px)] bg-black mbp:flex mbp:pt-0 mbp:pb-0 pt-[40px] pb-[40px]">
         <div className="w-full mbp:h-full flex flex-col justify-around mbp:w-[calc(100vw*0.5)]">
           <div className="topText w-full flex flex-col items-center">
             <div className="text-3xl font-[300] mbp:text-4xl">
