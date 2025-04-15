@@ -41,6 +41,7 @@ export default function Generate() {
 
             const obj = JSON.parse(decodeURIComponent(s!));
             const ele = document.getElementById("selectTemplateMobile");
+            const ele2 = document.getElementById("selectTemplate");
             let currentTemplates: Array<InvdividualTemplate> = []
             for(let templateId in obj) {
                 const currentTemplate: InvdividualTemplate = obj[templateId];
@@ -48,7 +49,12 @@ export default function Generate() {
                 const op = document.createElement("option");
                 op.id = `template_${templateId}`;
                 op.innerText = currentTemplate["templateName"];
+
+                const op2 = document.createElement("option");
+                op2.id = `template_${templateId}`;
+                op2.innerText = currentTemplate["templateName"];
                 ele!.appendChild(op);
+                ele2!.appendChild(op2);
             }
 
             setTemplates(currentTemplates)

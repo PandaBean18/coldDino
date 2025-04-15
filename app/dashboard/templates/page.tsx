@@ -1536,7 +1536,7 @@ export default function Templates() {
                                 </div>
                                 
                             </div>
-                            <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] hover:cursor-pointer">
+                            <div className="h-[50px] w-[90%] flex justify-between items-center rounded-[5px] hover:cursor-pointer" onClick={()=>{window.location.href = "/dashboard/generate"}}>
                                 <div className="flex items-center">
                                     <Image
                                         src="/sparkle.svg"
