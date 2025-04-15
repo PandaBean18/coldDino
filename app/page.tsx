@@ -241,7 +241,7 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
             
           </div>
         </div>
-        <div className="w-[95vw] h-[80%] flex flex-col mbp:flex-row mbp:h-full p-[15px] mbp:justify-around mbp:w-[450px] mbp:items-center items-center">
+        <div className="w-[95vw] h-[80%] max-h-[max-content] flex flex-col mbp:flex-row mbp:h-full p-[15px] mbp:justify-around mbp:w-[450px] mbp:items-center items-center">
           <div className="bg-white w-[70%] h-full mbp:h-[70%] mbp:w-full rounded-md relative">
             <div className="bg-blue-100 w-full h-[45px] absolute rounded-t-md flex justify-between">
               <div className="p-[10px] flex items-center font-medium"><p className="text-black">New Message</p></div>
