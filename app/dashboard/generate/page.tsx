@@ -173,7 +173,7 @@ export default function Generate() {
                 console.log("lmao")
                 for(let j = 0; j < endpoints.length; j++) {
                     try {
-                        const response = await axios.get(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
+                        const response = await axios.post(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
 
                         currentCompanyInfo.push(response.data);
                         const loadAnimation = document.getElementById(`${j}_loading_animation_mobile`);
@@ -190,8 +190,8 @@ export default function Generate() {
                         }
                         break;
                     
-                    } catch {
-                        console.log("error")
+                    } catch (e) {
+                        console.log("error: ", e);
                         const loadAnimation = document.getElementById(`${j}_loading_animation_mobile`);
                         const cross = document.getElementById(`${j}_cross_mobile`);
                         loadAnimation!.style.display = "none";
@@ -1111,7 +1111,7 @@ export default function Generate() {
                 console.log("lmao")
                 for(let j = 0; j < endpoints.length; j++) {
                     try {
-                        const response = await axios.get(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
+                        const response = await axios.post(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
 
                         currentCompanyInfo.push(response.data);
                         const loadAnimation = document.getElementById(`${j}_loading_animation`);
