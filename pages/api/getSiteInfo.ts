@@ -2,6 +2,9 @@ import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 import { parseHTML } from "linkedom";
 import { Readability } from "@mozilla/readability";
+import { db } from "@/utils/firebase";
+import { doc } from "firebase/firestore";
+import { getDoc, setDoc } from "firebase/firestore";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
@@ -10,6 +13,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const {domain, endpoint} = req.query;
+
+    const docRef = doc(db, "websiteInfoCache", domain as string)
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        const jsonData = {...(docSnap.data())}
+        res.status(200).json(jsonData);
+        return;
+    }
+
 
     if (!domain) {
         res.status(400).json({"error": "domain name not sent."});
@@ -34,6 +47,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 content: article.textContent,
                 excerpt: article.excerpt,
             };
+
+            try {
+                const newDocRef = doc(db, "websiteInfoCache", domain as string);
+                await setDoc(newDocRef, obj);
+            } catch (e) {
+                console.log("Error while adding website cache: ", e);
+            }
 
             res.status(200).json(obj);
             return
@@ -67,6 +87,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         content: article.textContent,
                         excerpt: article.excerpt,
                     };
+
+                    try {
+                        const newDocRef = doc(db, "websiteInfoCache", domain as string);
+                        await setDoc(newDocRef, obj);
+                    } catch (e) {
+                        console.log("Error while adding website cache: ", e);
+                    }
         
                     res.status(200).json(obj);
                     return
@@ -100,6 +127,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                                 content: article.textContent,
                                 excerpt: article.excerpt,
                             };
+            
+                            try {
+                                const newDocRef = doc(db, "websiteInfoCache", domain as string);
+                                await setDoc(newDocRef, obj);
+                            } catch (e) {
+                                console.log("Error while adding website cache: ", e);
+                            }
                 
                             res.status(200).json(obj);
                             return
@@ -131,6 +165,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                         content: article.textContent,
                         excerpt: article.excerpt,
                     };
+
+                    try {
+                        const newDocRef = doc(db, "websiteInfoCache", domain as string);
+                        await setDoc(newDocRef, obj);
+                    } catch (e) {
+                        console.log("Error while adding website cache: ", e);
+                    }
         
                     res.status(200).json(obj);
                     return
@@ -163,6 +204,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                                 content: article.textContent,
                                 excerpt: article.excerpt,
                             };
+            
+                            try {
+                                const newDocRef = doc(db, "websiteInfoCache", domain as string);
+                                await setDoc(newDocRef, obj);
+                            } catch (e) {
+                                console.log("Error while adding website cache: ", e);
+                            }
                 
                             res.status(200).json(obj);
                             return
@@ -197,6 +245,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                                         content: article.textContent,
                                         excerpt: article.excerpt,
                                     };
+            
+                                    try {
+                                        const newDocRef = doc(db, "websiteInfoCache", domain as string);
+                                        await setDoc(newDocRef, obj);
+                                    } catch (e) {
+                                        console.log("Error while adding website cache: ", e);
+                                    }
                         
                                     res.status(200).json(obj);
                                     return

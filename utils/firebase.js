@@ -20,6 +20,4 @@ if (!getApps().length) {
 
 const db = getFirestore(firebaseApp);
 
-console.log(db);
-
 export { db };
