@@ -13,3 +13,10 @@
 ## Points to note
 * Application stores the templates in cookies, so the same templates do not persist from one device to other.
 * The application has limited compatability with firefox as it treats whitespace differently causing issues while  creating templates.
+
+## License
+
+ColdDino is licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0/).
+
+You may use, share, or modify the code for **non-commercial purposes** with proper attribution.  
+For commercial use, please contact the author for permission.
