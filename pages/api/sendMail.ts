@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getCookie } from "cookies-next";
 import axios from "axios";
+import { db } from "@/utils/firebase";
+import { doc } from "firebase/firestore";
+import { getDoc } from "firebase/firestore";
+import { decode } from "jsonwebtoken";
 
 interface EmailData {
     to: string;
@@ -53,11 +57,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(405).json({"message": "method not allowed"});
     }
 
-    const tokens = await getCookie("gmail_tokens", {req, res});
+    const cookieStore = req.cookies;
+    const jwt = cookieStore["coldDinoJwt"];
+
+    if (jwt === undefined) {
+        return res.status(403).json({ "message": "JWT not found" });
+    }
+
+    const decodedJwt = decode(jwt);
+
+    if (decodedJwt === null || typeof(decodedJwt) === 'string') {
+        return res.status(403).json({ "message": "Invalid JWT" });
+    }
+
+    const userSub = decodedJwt.sub;
+
+    if (userSub === undefined){
+        return res.status(403).json({ "message": "user SUB not found in JWT" });
+    }
+
+    const docRef = doc(db, "authTokens", userSub);
+    const docSnap = await getDoc(docRef);
     const data = req.body as EmailData;
 
-    if (tokens) {
-        let t = JSON.parse(tokens) as GoogleTokens;
+    if (docSnap.exists()) {
+        let t = docSnap.data() as GoogleTokens;
 
         if (Date.now() > t.expires_in * 1000) {
             try {

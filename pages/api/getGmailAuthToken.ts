@@ -1,19 +1,20 @@
 "use server"
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { getCookie, setCookie } from "cookies-next";
-import { cookies } from "next/headers";
+import { db } from "@/utils/firebase";
+import { getDoc, setDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
+import { decode } from "jsonwebtoken";
 
 interface GoogleTokens {
     access_token: string;
     refresh_token: string;
     expires_in: number;
-    token_type: string;
 }
 
 const SCOPES = ["https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.compose"];
 
-async function refreshAccessToken(refreshToken: string, tokens: GoogleTokens, req: NextApiRequest, res: NextApiResponse): Promise<string> {
+async function refreshAccessToken(refreshToken: string, tokens: GoogleTokens): Promise<GoogleTokens> {
     try {
         const response = await axios.post("https://oauth2.googleapis.com/token", new URLSearchParams({
           client_id: process.env.GOOGLE_CLIENT_ID!,
@@ -27,21 +28,13 @@ async function refreshAccessToken(refreshToken: string, tokens: GoogleTokens, re
           }
         });
 
-        setCookie("gmail_tokens", JSON.stringify({
-            access_token: response.data.access_token,
-            refresh_token: tokens.refresh_token,
-            expires_in: Date.now() + (response.data.expires_in * 1000),
-            token_type: response.data.token_type
-          }), {
-            req,
-            res,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: response.data.expires_in
-          });
+        const obj: GoogleTokens = {
+          access_token: response.data.access_token,
+          refresh_token: tokens.refresh_token,
+          expires_in: Date.now() + (response.data.expires_in * 1000),
+        }
 
-        return response.data.access_token;
+        return obj;
       } catch (error: any) {
         throw new Error("Failed to refresh access token");
       }
@@ -54,15 +47,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     try {
         const cookieStore = req.cookies;
-        const tokenData = cookieStore["gmail_tokens"];
+        const jwt = cookieStore["coldDinoJwt"];
 
-        if (tokenData) {
+        if (jwt === undefined) {
+          res.status(403).json({message: "Unauthorized, JWT not present"});
+          return;
+        }
+        const decodedJwt = decode(jwt);
+
+        if (decodedJwt === null || typeof(decodedJwt) === "string") {
+          res.status(403).json({message: "JWT was not parsed correctly"});
+          return;
+        }
+
+        const userSub = decodedJwt["sub"];
+
+        if (userSub === undefined) {
+          res.status(403).json({message: "Could not extract user SUB from JWT"});
+          return;
+        }
+        const docRef = doc(db, "authTokens", userSub);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
             try {
-                const tokens: GoogleTokens = JSON.parse(tokenData.toString()) as GoogleTokens;
+                const tokens: GoogleTokens = docSnap.data() as GoogleTokens;
                 if (Date.now() >  tokens.expires_in * 1000) {
-                    await refreshAccessToken(tokens.refresh_token, tokens, req, res);                    
+                    const updatedData = await refreshAccessToken(tokens.refresh_token, tokens); 
+                    try {
+                      const newDocRef = doc(db, "authTokens", userSub);
+                      await setDoc(newDocRef, updatedData);
+                      return res.status(200).json({message: "Token present"});
+                    } catch (e) {
+                      console.log(e);
+                      return res.status(500).json({message: "There was an error while trying to save refreshed token."});
+                    }
+                } else {
+                  return res.status(200).json({message: "Token present"});
                 }
-                return res.status(200).json({message: "Token present"})
+                
             } catch (error) {
                 console.error("Error parsing token data:", error);
                 return res.status(403).json({ message: "Invalid token data" });

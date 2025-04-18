@@ -49,14 +49,7 @@ export default function Signin() {
                 const response = await axios.post("/api/verify", {"token": token});
                 Cookies.remove("coldDinoJwt");
                 Cookies.set("coldDinoJwt", token, {expires: 10});
-
-                const gmailAuthCookie: string | undefined = Cookies.get("gmail_tokens");
-
-                if (gmailAuthCookie === undefined) {
-                    window.location.href = "/signin/allow";
-                } else {
-                    window.location.href = "/dashboard/generate";
-                }
+                window.location.href = "/signin/allow";
             } catch {
                 alert("login failed");
                 window.location.href = "/signin";

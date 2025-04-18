@@ -1,6 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
-import { setCookie } from "cookies-next";
+import { db } from "@/utils/firebase";
+import { doc } from "firebase/firestore";
+import { setDoc } from "firebase/firestore";
+import { decode } from "jsonwebtoken";
+
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { code } = req.query;
@@ -21,22 +25,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               "Content-Type": "application/x-www-form-urlencoded"
             }
           });
-      
-          await setCookie("gmail_tokens", JSON.stringify({
+
+          const obj = {
             access_token: response.data.access_token,
             refresh_token: response.data.refresh_token,
-            expires_in: Date.now() + (response.data.expires_in * 1000),
-            token_type: response.data.token_type
-          }), {
-            req,
-            res,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: response.data.expires_in
-          });
-  
-          res.redirect(`${process.env.NEXT_PUBLIC_BASE_URL!}/signin/redirect`);
+            expires_in: Date.now() + (response.data.expires_in * 1000)
+          }
+
+          const cookieStore = req.cookies;
+          const jwt = cookieStore["coldDinoJwt"];
+
+          if (jwt === undefined) {
+            res.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/signin`)
+            return;
+          }
+
+          const decodedJwt = decode(jwt);
+
+          if (decodedJwt === null || typeof(decodedJwt) === "string") {
+            res.status(403).json({message: "Error decoding JWT"});
+            return;
+          }
+
+          const userSub = decodedJwt["sub"];
+
+          if (userSub === undefined){
+            res.status(403).json({message: "Uer SUB missing"});
+            return;
+          }
+
+          try {
+            const docRef = doc(db, "authTokens", userSub);
+            await setDoc(docRef, obj);
+            res.redirect(`${process.env.NEXT_PUBLIC_BASE_URL!}/signin/redirect`);
+          } catch (e) {
+            console.log(e);
+            res.status(500).json({message: "Error in storing authentication token"});
+            return;
+          } 
+            
     } catch (error) {
         console.log("OAuth callback error:", error);
         res.status(500).json({ message: "Authentication failed" });

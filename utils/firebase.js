@@ -1,3 +1,5 @@
+globalThis.navigator = { userAgent: 'node' };
+
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
