@@ -2,8 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getCookie } from "cookies-next";
 import axios from "axios";
 import { db } from "@/utils/firebase";
-import { doc } from "firebase/firestore";
-import { getDoc } from "firebase/firestore";
 import { decode } from "jsonwebtoken";
 
 interface EmailData {
@@ -58,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const cookieStore = req.cookies;
-    const jwt = cookieStore["coldDinoJwt"];
+    const jwt = cookieStore.coldDinoJwt;
 
     if (jwt === undefined) {
         return res.status(403).json({ "message": "JWT not found" });
@@ -76,11 +74,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(403).json({ "message": "user SUB not found in JWT" });
     }
 
-    const docRef = doc(db, "authTokens", userSub);
-    const docSnap = await getDoc(docRef);
+    const docRef = db.collection("authTokens").doc(userSub) //doc(db, "authTokens", userSub);
+    const docSnap = await docRef.get();
     const data = req.body as EmailData;
 
-    if (docSnap.exists()) {
+    if (docSnap.exists) {
         let t = docSnap.data() as GoogleTokens;
 
         if (Date.now() > t.expires_in * 1000) {

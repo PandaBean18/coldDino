@@ -3,8 +3,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { parseHTML } from "linkedom";
 import { Readability } from "@mozilla/readability";
 import { db } from "@/utils/firebase";
-import { doc } from "firebase/firestore";
-import { getDoc, setDoc } from "firebase/firestore";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
@@ -14,10 +12,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const {domain, endpoint} = req.query;
 
-    const docRef = doc(db, "websiteInfoCache", domain as string)
-    const docSnap = await getDoc(docRef);
+    const docRef = db.collection("websiteInfoCache").doc(domain as string);
+    const docSnap = await docRef.get();
 
-    if (docSnap.exists()) {
+    if (docSnap.exists) {
         const jsonData = {...(docSnap.data())}
         res.status(200).json(jsonData);
         return;
@@ -49,8 +47,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             };
 
             try {
-                const newDocRef = doc(db, "websiteInfoCache", domain as string);
-                await setDoc(newDocRef, obj);
+                const newDocRef = db.collection("websiteInfoCache").doc(domain as string)
+                await newDocRef.set(obj);
             } catch (e) {
                 console.log("Error while adding website cache: ", e);
             }
@@ -89,8 +87,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     };
 
                     try {
-                        const newDocRef = doc(db, "websiteInfoCache", domain as string);
-                        await setDoc(newDocRef, obj);
+                        const newDocRef = db.collection("websiteInfoCache").doc(domain as string);
+                        await newDocRef.set(obj);
                     } catch (e) {
                         console.log("Error while adding website cache: ", e);
                     }
@@ -129,8 +127,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                             };
             
                             try {
-                                const newDocRef = doc(db, "websiteInfoCache", domain as string);
-                                await setDoc(newDocRef, obj);
+                                const newDocRef = db.collection("websiteInfoCache").doc(domain as string);
+                                await newDocRef.set(obj);
                             } catch (e) {
                                 console.log("Error while adding website cache: ", e);
                             }
@@ -167,8 +165,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     };
 
                     try {
-                        const newDocRef = doc(db, "websiteInfoCache", domain as string);
-                        await setDoc(newDocRef, obj);
+                        const newDocRef = db.collection("websiteInfoCache").doc(domain as string);
+                        await newDocRef.set(obj);
                     } catch (e) {
                         console.log("Error while adding website cache: ", e);
                     }
@@ -206,8 +204,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                             };
             
                             try {
-                                const newDocRef = doc(db, "websiteInfoCache", domain as string);
-                                await setDoc(newDocRef, obj);
+                                const newDocRef = db.collection("websiteInfoCache").doc(domain as string);
+                                await newDocRef.set(obj);
                             } catch (e) {
                                 console.log("Error while adding website cache: ", e);
                             }
@@ -247,8 +245,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                                     };
             
                                     try {
-                                        const newDocRef = doc(db, "websiteInfoCache", domain as string);
-                                        await setDoc(newDocRef, obj);
+                                        const newDocRef = db.collection("websiteInfoCache").doc(domain as string);
+                                        await newDocRef.set(obj);
                                     } catch (e) {
                                         console.log("Error while adding website cache: ", e);
                                     }

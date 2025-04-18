@@ -1,8 +1,6 @@
 import { serverTimestamp } from 'firebase/firestore';
 import { db } from '../../utils/firebase';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { collection } from 'firebase/firestore';
-import { addDoc } from 'firebase/firestore';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
@@ -13,8 +11,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         try {
-            const waitlistCollectionRef = collection(db, 'waitlist');
-            await addDoc(waitlistCollectionRef, {
+            const waitlistCollectionRef = db.collection('waitlist');
+            await waitlistCollectionRef.add({
                 email: email,
                 timestamp: serverTimestamp(),
             });

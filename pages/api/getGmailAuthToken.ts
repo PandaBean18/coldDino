@@ -2,8 +2,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { db } from "@/utils/firebase";
-import { getDoc, setDoc } from "firebase/firestore";
-import { doc } from "firebase/firestore";
 import { decode } from "jsonwebtoken";
 
 interface GoogleTokens {
@@ -47,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     try {
         const cookieStore = req.cookies;
-        const jwt = cookieStore["coldDinoJwt"];
+        const jwt = cookieStore.coldDinoJwt;
 
         if (jwt === undefined) {
           res.status(403).json({message: "Unauthorized, JWT not present"});
@@ -66,17 +64,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           res.status(403).json({message: "Could not extract user SUB from JWT"});
           return;
         }
-        const docRef = doc(db, "authTokens", userSub);
-        const docSnap = await getDoc(docRef);
+        const docRef = db.collection("authTokens").doc(userSub);
+        const docSnap = await docRef.get();
 
-        if (docSnap.exists()) {
+        if (docSnap.exists) {
             try {
                 const tokens: GoogleTokens = docSnap.data() as GoogleTokens;
                 if (Date.now() >  tokens.expires_in * 1000) {
                     const updatedData = await refreshAccessToken(tokens.refresh_token, tokens); 
                     try {
-                      const newDocRef = doc(db, "authTokens", userSub);
-                      await setDoc(newDocRef, updatedData);
+                      const newDocRef = db.collection("authTokens").doc(userSub);
+                      await newDocRef.set(updatedData);
                       return res.status(200).json({message: "Token present"});
                     } catch (e) {
                       console.log(e);

@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import axios from 'axios';
-import { db } from './utils/firebase';
-import { doc } from 'firebase/firestore';
-import { getDoc } from 'firebase/firestore';
 import { decode } from 'jsonwebtoken';
 
 export async function middleware(req: NextRequest) {
@@ -35,12 +32,6 @@ export async function middleware(req: NextRequest) {
             return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/signin`);
         }
 
-        const docRef = doc(db, "authTokens", userSub);
-        const docSnap = await getDoc(docRef);
-        
-        if (!docSnap.exists()) {
-            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/signin/allow`);
-        }
     }
     return NextResponse.next();
 }

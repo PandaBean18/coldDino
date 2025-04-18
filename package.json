@@ -2,6 +2,7 @@
   "name": "cold_mailer",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -15,7 +16,7 @@
     "axios": "^1.8.3",
     "cookies-next": "^5.1.0",
     "firebase": "^11.6.0",
-    "firebase-admin": "^13.2.0",
+    "firebase-admin": "^11.11.1",
     "jose": "^6.0.10",
     "js-cookie": "^3.0.5",
     "jsdom": "^26.0.0",

@@ -1,8 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 import { db } from "@/utils/firebase";
-import { doc } from "firebase/firestore";
-import { setDoc } from "firebase/firestore";
 import { decode } from "jsonwebtoken";
 
 
@@ -33,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
 
           const cookieStore = req.cookies;
-          const jwt = cookieStore["coldDinoJwt"];
+          const jwt = cookieStore.coldDinoJwt;
 
           if (jwt === undefined) {
             res.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/signin`)
@@ -55,8 +53,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
 
           try {
-            const docRef = doc(db, "authTokens", userSub);
-            await setDoc(docRef, obj);
+            const docRef = db.collection("authTokens").doc(userSub);
+            await docRef.set(obj);
             res.redirect(`${process.env.NEXT_PUBLIC_BASE_URL!}/signin/redirect`);
           } catch (e) {
             console.log(e);
