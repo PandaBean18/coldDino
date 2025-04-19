@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "ColdDino",
-  description: "Automate Personalization of your cold emails using AI",
+  description: "ColdDino helps students, job seekers, and freelancers personalize cold emails by analyzing company websites. Sign in with Google to get started.",
 };
 
 export default function RootLayout({
