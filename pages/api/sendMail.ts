@@ -81,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (docSnap.exists) {
         let t = docSnap.data() as GoogleTokens;
 
-        if (Date.now() > t.expires_in * 1000) {
+        if (Date.now() > t.expires_in) {
             try {
                 await axios.post("/api/getGmailAuthTokens");
                 const s = await getCookie("gmail_tokens",  {req, res});

@@ -70,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (docSnap.exists) {
             try {
                 const tokens: GoogleTokens = docSnap.data() as GoogleTokens;
-                if (Date.now() >  tokens.expires_in * 1000) {
+                if (Date.now() >  tokens.expires_in) {
                     const updatedData = await refreshAccessToken(tokens.refresh_token, tokens); 
                     try {
                       const newDocRef = db.collection("authTokens").doc(userSub);
