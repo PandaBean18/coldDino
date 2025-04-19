@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const waitlistCollectionRef = db.collection('waitlist');
             await waitlistCollectionRef.add({
                 email: email,
-                timestamp: serverTimestamp(),
+                timestamp: new Date(),
             });
             return res.status(200).json({ message: 'You have successfully joined the waitlist!' });
         } catch (err) {
