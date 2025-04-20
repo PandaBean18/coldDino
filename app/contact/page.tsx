@@ -85,8 +85,13 @@ export default function Contact() {
             document.getElementById("contactForm")!.style.display = "none";
             document.getElementById("contactSent")!.style.display = "flex";
 
-        } catch {
-            alert("Something went wrong.");
+        } catch(e: any) {
+            if (e.status === 429) {
+                alert("Rate limit exceeded.");
+            } else {
+                alert("Something went wrong.");
+            }
+
             sendButton!.style.display = "block";
             sendButtonLoading!.style.display = "none";
             return;

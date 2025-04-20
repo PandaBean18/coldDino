@@ -39,7 +39,7 @@ export default function PrivacyPolicy() {
             </div>
 
             <div className="w-full p-[20px] text-[#121212]">
-                <p>Last Updated: April 17th, 2025</p>
+                <p>Last Updated: April 20th, 2025</p>
                 <br />
                 <p>ColdDino ("we", "our", or "us") values your privacy. This Privacy Policy outlines how we handle your data when you use our service.</p>
                 <br />
@@ -51,6 +51,7 @@ export default function PrivacyPolicy() {
                             <li><span className="font-semibold">Google Profile Info:</span> While signing in via Google One Tap, we may access your name and email for authentication only</li>
                             <li><span className="font-semibold">Cookies/Local Storage:</span> Used to store session data and to store your email templates.</li>
                             <li><span className="font-semibold">Email Templates (Conditional):</span> By default, we do not store or access any email templates or generated content. In cases where you contact us about poor content quality and explicitly consent, we may request a sample email template and company name. These may be added to our fine-tuning dataset and could persist for future model training.</li>
+                            <li><span className="font-semibold">IP Addresses:</span> IP addresses are used temporarily to enforce rate limits on our APIs and prevent abuse of our services. This data is stored securly and only for a short period (1 minute). <strong>It is not used for tracking or profiling users.</strong></li>
                         </ul>
                     </li>
                     <br />
@@ -61,16 +62,19 @@ export default function PrivacyPolicy() {
                             <li>Authenticate you.</li>
                             <li>Maintain and communicate through the waitlist.</li>
                             <li>Improve AI performance (with consent, as above).</li>
+                            <li>Enforce rate limits on our API and prevent abuse of our services.</li>
                         </ul>
                     </li>
                     <br />
                     <li>
                         Third-Party Services
+                        <p className="text-xl font-normal">These services are bound by their own privacy policies and operate within secure infrastructure.</p>
                         <ul className="list-disc pl-[10px] text-xl font-normal">
                             <li><span className="font-semibold">Google</span> (for authentication, Gmail API, and Drive API)</li>
                             <li><span className="font-semibold">Firebase</span> (for backend infrastructure)</li>
                             <li><span className="font-semibold">Vercel</span> (for hosting ColdDino web application)</li>
                             <li><span className="font-semibold">Gemini by Google</span> (A fine-tuned model to generate personalized emails)</li>
+                            <li><span className="font-semibold">Upstash</span> (for storing rate limit data)</li>
                         </ul>
                     </li>
                     <br />

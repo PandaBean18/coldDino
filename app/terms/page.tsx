@@ -39,7 +39,7 @@ export default function TermsAndConditions() {
             </div>
 
             <div className="w-full p-[20px] text-[#121212]">
-                <p>Last Updated: April 17th, 2025</p>
+                <p>Last Updated: April 20th, 2025</p>
                 <br />
                 <p>Welcome to ColdDino! These Terms and Conditions ("Terms") govern your access to and use of ColdDino ("we", "our", or "us") and its services. By using our website or application, you agree to these Terms.</p>
                 <br />
@@ -57,6 +57,11 @@ export default function TermsAndConditions() {
                     <li>
                         Data Usage
                         <p className="text-xl font-normal">We do not store user-generated content by default. Your data primarily resides in your browser (cookies or local storage). The only data we collect directly is your email when you sign up for the waitlist. See our <a className="text-blue-500" href="/privacy">Privacy Policy</a> for full details.</p>
+                    </li>
+                    <br />
+                    <li>
+                        Usage Limitations
+                        <p className="text-xl font-normal">To ensure fair usage and protect the integrity of our services, we implement rate limiting on certain routes. As part of this process, we may temporarily associate your IP address with request counts. This data is used exclusively for security and performance optimization, and is not retained beyond what is necessary for enforcement.</p>
                     </li>
                     <br />
                     <li>
