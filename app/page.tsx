@@ -186,7 +186,7 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
         </div>
       </div>
       {/* Footer */}
-      <div className="w-full h-max bg-white border-t-1 border-zinc-300 flex items-center justify-between p-[20px]">
+      <div className="w-full h-max bg-gray-300 flex items-center justify-between p-[20px]">
         <div className="h-full w-max flex justify-center items-center">
           <Image 
             src="/logo.svg"
@@ -199,9 +199,9 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
         </div>
         <div className="flex justify-between h-full w-[50%] items-center justify-center">
           <div className="justify-evenly block text-xl">
-            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/privacy"}}>Privacy</p></div>
-            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/terms"}}>Terms</p></div>
-            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/contact"}}>Contact</p></div>
+            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-transparent hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/privacy"}}>Privacy</p></div>
+            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-transparent hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/terms"}}>Terms</p></div>
+            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-transparent hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/contact"}}>Contact</p></div>
           </div>
         </div>
       </div>
@@ -232,6 +232,7 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
           <div className="justify-evenly hidden sm:flex">
             <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{document.getElementById("features")?.scrollIntoView({behavior: "smooth"})}}>Features</p></div>
             <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/waitlist"}}>Waitlist</p></div>
+            <div className="p-[5px] flex justify-center items-center color-black text-black"><a href="https://youtu.be/PhzUVAGeWvI" className="border-b-1 border-white hover:border-black hover:cursor-pointer">Demo</a></div>
             <div className="p-[5px] pr-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={handleRedirect}>Login</p></div>
           </div>
           <div className="ml-[10px] h-[70%] pl-[15px] pr-[15px] flex justify-center items-center text-white bg-black font-medium rounded-md hover:cursor-pointer mr-[20px]" onClick={handleRedirect}>
@@ -396,7 +397,7 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
         </div>
       </div>
       {/* Footer */}
-      <div className="w-full h-[75px] bg-white border-t-1 border-zinc-300 flex items-center justify-between p-[20px] pl-[40px] pr-[40px]">
+      <div className="w-full h-[75px] bg-gray-300 border-t-1 border-zinc-300 flex items-center justify-between p-[20px] pl-[40px] pr-[40px]">
         <div className="h-full w-max flex justify-center items-center">
           <Image 
             src="/logo.svg"
@@ -409,9 +410,9 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
         </div>
         <div className="flex justify-between h-full w-fit items-center">
           <div className="justify-evenly hidden sm:flex text-2xl">
-            <div className="p-[10px] pl-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/privacy"}}>Privacy</p></div>
-            <div className="p-[10px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/terms"}}>Terms</p></div>
-            <div className="p-[10px] pr-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/contact"}}>Contact</p></div>
+            <div className="p-[10px] pl-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-transparent hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/privacy"}}>Privacy</p></div>
+            <div className="p-[10px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-transparent hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/terms"}}>Terms</p></div>
+            <div className="p-[10px] pr-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-transparent hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/contact"}}>Contact</p></div>
           </div>
         </div>
       </div>
