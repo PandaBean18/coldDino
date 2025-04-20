@@ -9,7 +9,8 @@ const ROUTE_LIMITS: Record<string, {limit: number, window: number}> = {
     "/api/getSiteInfo": {limit: 20, window: 60},
     "/api/contact": {limit: 5, window: 60},
     "/api/saveMail": {limit: 5, window: 60},
-    "/api/saveDraft": {limit: 5, window: 60}
+    "/api/saveDraft": {limit: 5, window: 60},
+    "/api/waitlist": {limit: 5, window: 60}
 }
 
 const redis = new Redis({
