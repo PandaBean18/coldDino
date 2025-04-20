@@ -185,6 +185,26 @@ function mobileView(authUri: string, currentValue: string, currentEmail: string,
           <p className="text-white text-xl" style={{fontFamily: "Poppins"}}>Instead of sending the emails one at a time, you can upload a CSV file containing upto 20 emails of contacts that you wish to send cold emails to. The app will automatically parse them.</p>
         </div>
       </div>
+      {/* Footer */}
+      <div className="w-full h-max bg-white border-t-1 border-zinc-300 flex items-center justify-between p-[20px]">
+        <div className="h-full w-max flex justify-center items-center">
+          <Image 
+            src="/logo.svg"
+            height={40}
+            width={40}
+            alt="logo"
+          />
+          <div className="w-[10px] h-full"></div>
+          <p className="text-black text-2xl font-bold">ColdDino</p>
+        </div>
+        <div className="flex justify-between h-full w-[50%] items-center justify-center">
+          <div className="justify-evenly block text-xl">
+            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/privacy"}}>Privacy</p></div>
+            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/terms"}}>Terms</p></div>
+            <div className="p-[5px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/contact"}}>Contact</p></div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -372,6 +392,26 @@ function desktopView(authUri: string, currentValue: string, currentEmail: string
             <p className="text-white text-3xl font-bold" style={{fontFamily: "Bebas Neue"}}>Send emails in batches</p>
             <br />
             <p className="text-white text-xl" style={{fontFamily: "Poppins"}}>Instead of sending the emails one at a time, you can upload a CSV file containing upto 20 emails of contacts that you wish to send cold emails to. The app will automatically parse them.</p>
+          </div>
+        </div>
+      </div>
+      {/* Footer */}
+      <div className="w-full h-[75px] bg-white border-t-1 border-zinc-300 flex items-center justify-between p-[20px] pl-[40px] pr-[40px]">
+        <div className="h-full w-max flex justify-center items-center">
+          <Image 
+            src="/logo.svg"
+            height={50}
+            width={50}
+            alt="logo"
+          />
+          <div className="w-[10px] h-full"></div>
+          <p className="text-black text-4xl font-bold">ColdDino</p>
+        </div>
+        <div className="flex justify-between h-full w-fit items-center">
+          <div className="justify-evenly hidden sm:flex text-2xl">
+            <div className="p-[10px] pl-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/privacy"}}>Privacy</p></div>
+            <div className="p-[10px] flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/terms"}}>Terms</p></div>
+            <div className="p-[10px] pr-0 flex justify-center items-center color-black text-black"><p className="border-b-1 border-white hover:border-black hover:cursor-pointer" onClick={()=>{window.location.href = "/contact"}}>Contact</p></div>
           </div>
         </div>
       </div>
