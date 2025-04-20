@@ -1,7 +1,6 @@
 "use client"
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { jwtVerify } from "jose";
 import Cookies from "js-cookie";
 import axios from "axios";
 

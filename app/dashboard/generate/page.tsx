@@ -170,11 +170,10 @@ export default function Generate() {
             const endpoints = ["/about", "/aboutus", "/about-us", "/"];
             let currentCompanyInfo: Array<SiteInfoResponse> = []
             for(let i = 0; i < currentCompanyDomains.length; i++) {
-                console.log("lmao")
                 for(let j = 0; j < endpoints.length; j++) {
                     try {
-                        const response = await axios.post(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
-
+                        let response = await axios.post(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
+                        
                         currentCompanyInfo.push(response.data);
                         const loadAnimation = document.getElementById(`${j}_loading_animation_mobile`);
                         const check = document.getElementById(`${j}_check_mobile`);
@@ -190,7 +189,13 @@ export default function Generate() {
                         }
                         break;
                     
-                    } catch (e) {
+                    } catch (e: any) {
+
+                        if (e.status === 429) {
+                            alert("Rate limit exceeded");
+                            break;
+                        }
+
                         console.log("error: ", e);
                         const loadAnimation = document.getElementById(`${j}_loading_animation_mobile`);
                         const cross = document.getElementById(`${j}_cross_mobile`);
@@ -326,7 +331,19 @@ export default function Generate() {
                 const generatedMailLoadingDiv = document.getElementById("generatedMailLoadingMobile");
                 const generatedMailLoadedDiv = document.getElementById("generatedMailLoadedMobile");
 
-                const response = await axios.post("/api/generateContent", companyInfo[i]);
+                let response;
+                
+                try {
+                    response = await axios.post("/api/generateContent", companyInfo[i]);
+                } catch (e: any) {
+                    if (e.status === 429) {
+                        alert("Rate limit exceeded");
+                        break;
+                    } else {
+                        alert("Something went wrong");
+                        continue;
+                    }
+                }
 
                 if (i === 0) {
                     const subjectDiv = document.getElementById("generatedMailSubjectMobile");
@@ -340,6 +357,7 @@ export default function Generate() {
                 }
                 currentGeneratedContent.push(response.data);
                 setGeneratedContent(currentGeneratedContent.slice(0))
+
 
             }
 
@@ -1035,7 +1053,19 @@ export default function Generate() {
                 const generatedMailLoadingDiv = document.getElementById("generatedMailLoading");
                 const generatedMailLoadedDiv = document.getElementById("generatedMailLoaded");
 
-                const response = await axios.post("/api/generateContent", companyInfo[i]);
+                let response;
+                
+                try {
+                    response = await axios.post("/api/generateContent", companyInfo[i]);
+                } catch (e: any) {
+                    if (e.status === 429) {
+                        alert("Rate limit exceeded");
+                        break;
+                    } else {
+                        alert("Something went wrong");
+                        continue;
+                    }
+                }
 
                 if (i === 0) {
                     const subjectDiv = document.getElementById("generatedMailSubject");
@@ -1111,8 +1141,8 @@ export default function Generate() {
                 console.log("lmao")
                 for(let j = 0; j < endpoints.length; j++) {
                     try {
-                        const response = await axios.post(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
-
+                        let response = await axios.post(`/api/getSiteInfo?domain=${currentCompanyDomains[i]}&endpoint=${endpoints[j]}`);
+                        
                         currentCompanyInfo.push(response.data);
                         const loadAnimation = document.getElementById(`${j}_loading_animation`);
                         const check = document.getElementById(`${j}_check`);
@@ -1128,8 +1158,12 @@ export default function Generate() {
                         }
                         break;
                     
-                    } catch {
-                        console.log("error")
+                    } catch (e: any) {
+                        if (e.status === 429) {
+                            alert("Rate limit exceeded");
+                            break;
+                        }
+                        console.log("error: ", e)
                         const loadAnimation = document.getElementById(`${j}_loading_animation`);
                         const cross = document.getElementById(`${j}_cross`);
                         loadAnimation!.style.display = "none";
