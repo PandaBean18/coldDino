@@ -1,11 +1,10 @@
 'use client'
 import Image from "next/image"
-import { ChangeEvent, Dispatch, SetStateAction, useEffect } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import Cookies from "js-cookie"
-import axios from "axios";
-import { NextApiRequest, NextApiResponse, Redirect } from "next";
-import { redirect } from "next/dist/server/api-utils";
+
+declare const gapi: any;
 
 declare global {
     interface HTMLElement {
@@ -24,6 +23,12 @@ declare global {
     interface EventTarget {
         value: string
     }
+
+    interface Window {
+        gapi: any;
+        google: any;
+        pickerCallback: any,
+    }
 }
 
 interface InvdividualTemplate {
@@ -36,9 +41,110 @@ interface InvdividualTemplate {
     templateName: string, 
     subject: string,
     message: string,
+}
+
+interface FileObj {
+    fileId: string,
+    fileName: string,
+    mimeType: string,
 }
 
 export default function Templates() {
+
+    const [accessToken, setAccessToken] = useState(null);
+  const [pickerInited, setPickerInited] = useState(false);
+  const [gisInited, setGisInited] = useState(false);
+  const [tokenClient, setTokenClient]: Array<any> = useState(null);
+
+    function onApiLoad() {
+        if (window.gapi) {
+            gapi.load('picker', onPickerApiLoad);
+        }
+    }
+
+    function onPickerApiLoad() {
+        setPickerInited(true);
+    }
+
+    async function gisLoaded() {
+        const resp = window.google.accounts.oauth2.initTokenClient({
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+            scope: 'https://www.googleapis.com/auth/drive.readonly',
+            callback: '',
+        });
+        setTokenClient(resp);
+        setGisInited(true);
+    }
+
+    useEffect(() => {
+        const loadGooglePickerScript = () => {
+            const script = document.createElement('script');
+            script.src = "https://apis.google.com/js/api.js";
+            script.async = true;
+            script.defer = true;
+            script.onload = () => {
+                onApiLoad()
+            };
+            document.body.appendChild(script);
+        };
+
+        const loadGsiScript = () => {
+            const script = document.createElement('script');
+            script.src = "https://accounts.google.com/gsi/client";
+            script.async = true;
+            script.defer = true;
+            script.onload = () => {
+                gisLoaded();
+            };
+            document.body.appendChild(script);
+        };
+
+        loadGooglePickerScript();
+        loadGsiScript();
+    }, []);
+
+    function createPicker() {
+        const showPicker = (a: string) => {
+          const picker = new window.google.picker.PickerBuilder()
+              .addView(window.google.picker.ViewId.DOCS)
+              .setOAuthToken(a)
+              .setDeveloperKey(process.env.NEXT_PUBLIC_GOOGLE_PICKER_API_KEY)
+              .setCallback(pickerCallback)
+              .setAppId(process.env.NEXT_PUBLIC_GOOGLE_PROJECT_APP_ID)
+              .build();
+          picker.setVisible(true);
+        }
+  
+        tokenClient!.callback = async (response: any) => {
+          if (response.error !== undefined) {
+            throw (response);
+          }
+          setAccessToken(response.access_token);
+          showPicker(response.access_token);
+        };
+  
+        if (accessToken === null) {
+          tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+          tokenClient.requestAccessToken({prompt: ''});
+        }
+    }
+
+    function pickerCallback(data: any) {
+        let urls: Array<FileObj> = [];
+
+        if (data.action == window.google.picker.Action.PICKED) {
+          for(let i = 0; i < data.docs.length; i++) {
+            const obj: FileObj = {
+                fileId: data.docs[i].id,
+                fileName: data.docs[i].name,
+                mimeType: data.docs[i].mimeType,
+            }
+            urls.push(obj);
+          }
+        }
+      }
+
     let navBarImage: string = "/hamburger.svg"
     let [totalTemplateCount, setTotalTemplateCount] = useState(0);
     const [newTemplateName, setNewTemplateName] = useState(`Template ${totalTemplateCount+1}`)
@@ -1643,7 +1749,7 @@ export default function Templates() {
                                                             alt="link"
                                                         />
                                                     </div>
-                                                    <div className="h-[50px] w-[50px] flex justify-center items-center hover:cursor-pointer">
+                                                    <div className="h-[50px] w-[50px] flex justify-center items-center hover:cursor-pointer" onClick={createPicker}>
                                                         <Image
                                                             src="/attachment.svg"
                                                             height={30}

@@ -10,6 +10,7 @@ export default function Allow() {
             const response = await axios.post("/api/getGmailAuthToken");
             window.location.href = "/dashboard/generate"
         } catch (e: any) {
+            console.log(e);
             if (e.status === 401) {
                 window.location.href = e.response.data.authUrl;
             } else {

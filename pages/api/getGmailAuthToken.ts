@@ -10,7 +10,7 @@ interface GoogleTokens {
     expires_in: number;
 }
 
-const SCOPES = ["https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.compose"];
+const SCOPES = ["https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.compose", "https://www.googleapis.com/auth/drive.readonly"];
 
 async function refreshAccessToken(refreshToken: string, tokens: GoogleTokens): Promise<GoogleTokens> {
     try {
