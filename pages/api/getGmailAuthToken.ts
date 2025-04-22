@@ -15,7 +15,7 @@ const SCOPES = ["https://www.googleapis.com/auth/gmail.send", "https://www.googl
 async function refreshAccessToken(refreshToken: string, tokens: GoogleTokens): Promise<GoogleTokens> {
     try {
         const response = await axios.post("https://oauth2.googleapis.com/token", new URLSearchParams({
-          client_id: process.env.GOOGLE_CLIENT_ID!,
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
           client_secret: process.env.GOOGLE_CLIENT_SECRET!,
           refresh_token: refreshToken,
           redirect_uri: `${process.env.NEXT_PUBLIC_BASE_URL}/api/gmailCallback`,
@@ -34,6 +34,7 @@ async function refreshAccessToken(refreshToken: string, tokens: GoogleTokens): P
 
         return obj;
       } catch (error: any) {
+        console.log(error.response);
         throw new Error("Failed to refresh access token");
       }
 }
@@ -90,7 +91,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
         } else {
             const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-            authUrl.searchParams.set("client_id", process.env.GOOGLE_CLIENT_ID!);
+            authUrl.searchParams.set("client_id", process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!);
             authUrl.searchParams.set("redirect_uri", `${process.env.NEXT_PUBLIC_BASE_URL}/api/gmailCallback`);
             authUrl.searchParams.set("response_type", "code");
             authUrl.searchParams.set("scope", SCOPES.join(" "));

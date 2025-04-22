@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         const response = await axios.post("https://oauth2.googleapis.com/token", new URLSearchParams({
             code: code as string,
-            client_id: process.env.GOOGLE_CLIENT_ID!,
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
             client_secret: process.env.GOOGLE_CLIENT_SECRET!,
             redirect_uri: `${process.env.NEXT_PUBLIC_BASE_URL}/api/gmailCallback`,
             grant_type: "authorization_code"

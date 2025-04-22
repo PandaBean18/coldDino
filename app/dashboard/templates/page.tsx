@@ -52,9 +52,9 @@ interface FileObj {
 export default function Templates() {
 
     const [accessToken, setAccessToken] = useState(null);
-  const [pickerInited, setPickerInited] = useState(false);
-  const [gisInited, setGisInited] = useState(false);
-  const [tokenClient, setTokenClient]: Array<any> = useState(null);
+    const [pickerInited, setPickerInited] = useState(false);
+    const [gisInited, setGisInited] = useState(false);
+    const [tokenClient, setTokenClient]: Array<any> = useState(null);
 
     function onApiLoad() {
         if (window.gapi) {
@@ -105,28 +105,28 @@ export default function Templates() {
 
     function createPicker() {
         const showPicker = (a: string) => {
-          const picker = new window.google.picker.PickerBuilder()
-              .addView(window.google.picker.ViewId.DOCS)
-              .setOAuthToken(a)
-              .setDeveloperKey(process.env.NEXT_PUBLIC_GOOGLE_PICKER_API_KEY)
-              .setCallback(pickerCallback)
-              .setAppId(process.env.NEXT_PUBLIC_GOOGLE_PROJECT_APP_ID)
-              .build();
-          picker.setVisible(true);
+            const picker = new window.google.picker.PickerBuilder()
+                .addView(window.google.picker.ViewId.DOCS)
+                .setOAuthToken(a)
+                .setDeveloperKey(process.env.NEXT_PUBLIC_GOOGLE_PICKER_API_KEY)
+                .setCallback(pickerCallback)
+                .setAppId(process.env.NEXT_PUBLIC_GOOGLE_PROJECT_APP_ID)
+                .build();
+            picker.setVisible(true);
         }
   
         tokenClient!.callback = async (response: any) => {
-          if (response.error !== undefined) {
-            throw (response);
-          }
-          setAccessToken(response.access_token);
-          showPicker(response.access_token);
+            if (response.error !== undefined) {
+                throw (response);
+            }
+            setAccessToken(response.access_token);
+            showPicker(response.access_token);
         };
   
         if (accessToken === null) {
-          tokenClient.requestAccessToken({prompt: 'consent'});
+            tokenClient.requestAccessToken({prompt: 'consent'});
         } else {
-          tokenClient.requestAccessToken({prompt: ''});
+            tokenClient.requestAccessToken({prompt: ''});
         }
     }
 
@@ -134,16 +134,16 @@ export default function Templates() {
         let urls: Array<FileObj> = [];
 
         if (data.action == window.google.picker.Action.PICKED) {
-          for(let i = 0; i < data.docs.length; i++) {
-            const obj: FileObj = {
-                fileId: data.docs[i].id,
-                fileName: data.docs[i].name,
-                mimeType: data.docs[i].mimeType,
+            for(let i = 0; i < data.docs.length; i++) {
+                const obj: FileObj = {
+                    fileId: data.docs[i].id,
+                    fileName: data.docs[i].name,
+                    mimeType: data.docs[i].mimeType,
+                }
+                urls.push(obj);
             }
-            urls.push(obj);
-          }
         }
-      }
+    }
 
     let navBarImage: string = "/hamburger.svg"
     let [totalTemplateCount, setTotalTemplateCount] = useState(0);
