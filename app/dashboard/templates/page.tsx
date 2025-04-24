@@ -1,6 +1,6 @@
 'use client'
 import Image from "next/image"
-import { useEffect } from "react";
+import { RefObject, useEffect, useRef } from "react";
 import { useState } from "react";
 import Cookies from "js-cookie"
 
@@ -12,6 +12,8 @@ declare global {
         value: string,
         href: string,
         disabled: string,
+        selectionStart: number,
+        selectionEnd: number,
     }
 
     interface Event {
@@ -584,52 +586,6 @@ export default function Templates() {
             }
         }
 
-        function applyLink() {
-            const gotoTextInput = document.getElementById("applyLinkGoToText");
-            const url = gotoTextInput!.value;
-            messageTagListener(url);
-            const parentDiv = document.getElementById("newTemplateFormMobile");
-            parentDiv!.removeChild(applyLinkDiv);
-            addLinkDivShowing = false;
-        }
-
-        function createApplyLinkDiv(x: number, y: number) {
-            const e = document.createElement("div");
-            const inputEle1 = document.createElement("input");
-            inputEle1.type = "text";
-            inputEle1.id = "applyLinkDisplayText"
-            inputEle1.className = "border-1 border-zinc-300 h-[40px] w-[180px] p-[10px] rounded-[2.5px] focus:outline-1 text-zinc-500";
-            inputEle1.placeholder = "Display Text";
-
-            const inputEle2 = document.createElement("input");
-            inputEle2.type = "text";
-            inputEle2.className = "border-1 border-zinc-300 h-[40px] w-[180px] p-[10px] rounded-[2.5px] focus:outline-1 text-zinc-500";
-            inputEle2.placeholder = "Go To Link";
-            inputEle2.id = "applyLinkGoToText"
-
-            inputEle2.addEventListener("input", () => {
-                addNewLinkEventListener(linkCount.toString());
-            });
-
-
-            const inputButton = document.createElement("input");
-            inputButton.type = "button";
-            inputButton.className = "border-1 border-zinc-600 h-[40px] w-[80%] bg-zinc-500 text-white rounded-[2.5px] hover:cursor-pointer"
-            inputButton.value = "Apply Link"
-            inputButton.onclick = applyLink;
-            inputButton.id = "applyLinkButton";
-            inputButton.disabled = true;
-    
-            const t = `absolute bg-white h-[200px] w-[200px] rounded-[5px] shadow-[0_4px_8px_0_rgba(0,0,0,0.2),0_6px_20px_0_rgba(0,0,0,0.19)] p-[10px] flex flex-col items-center justify-evenly`;
-            e.className = t;
-            e.style.top = `${y}px`;
-            e.style.left  = `${x}px`;
-            e.appendChild(inputEle1);
-            e.appendChild(inputEle2);
-            e.appendChild(inputButton);
-            return e;
-        }
-
         function calculateApplyLinkDivPos(divHeight: number = 200, divWidth : number = 200) {
             const selection = window.getSelection();
             const range = selection!.getRangeAt(0).cloneRange();
@@ -668,64 +624,64 @@ export default function Templates() {
             return selection!.toString();
         }
 
-        function toggleAddlink() {
-            const parentDiv = document.getElementById("newTemplateFormMobile")
-            const messageDiv = document.getElementById("newTemplateMessageContentMobile")
+        // function toggleAddlink() {
+        //     const parentDiv = document.getElementById("newTemplateFormMobile")
+        //     const messageDiv = document.getElementById("newTemplateMessageContentMobile")
             
-            if (!addLinkDivShowing) {
-                const [calculatedX, calculatedY] = calculateApplyLinkDivPos();
-                applyLinkDiv = createApplyLinkDiv(calculatedX, calculatedY);
-                linkCount += 1;
-                parentDiv!.appendChild(applyLinkDiv)
+        //     if (!addLinkDivShowing) {
+        //         const [calculatedX, calculatedY] = calculateApplyLinkDivPos();
+        //         applyLinkDiv = createApplyLinkDiv(calculatedX, calculatedY);
+        //         linkCount += 1;
+        //         parentDiv!.appendChild(applyLinkDiv)
                 
-                const displayText = getSelectedText();
-                if (displayText === null) {
-                    addLinkDivShowing = false;
-                } else {
-                    cursorPositionBeforeLink = getCountCharactersBefore(messageDiv!);
-                    const d = document.getElementById("applyLinkDisplayText");
-                    d!.value = displayText;
-                    d!.disabled = "true";
-                    const messageContent = messageDiv!.innerText;
-                    messageDiv!.innerHTML = ""
-                    for (let i = 0; i < messageContent!.length; i++) {
-                        if (i === (cursorPositionBeforeLink - displayText.length)) {
+        //         const displayText = getSelectedText();
+        //         if (displayText === null) {
+        //             addLinkDivShowing = false;
+        //         } else {
+        //             cursorPositionBeforeLink = getCountCharactersBefore(messageDiv!);
+        //             const d = document.getElementById("applyLinkDisplayText");
+        //             d!.value = displayText;
+        //             d!.disabled = "true";
+        //             const messageContent = messageDiv!.innerText;
+        //             messageDiv!.innerHTML = ""
+        //             for (let i = 0; i < messageContent!.length; i++) {
+        //                 if (i === (cursorPositionBeforeLink - displayText.length)) {
                             
-                            const ele = document.createElement("span");
-                            ele.style.display = "inline-flex";
-                            ele.style.width = "0";
-                            ele.style.height = "0";
-                            ele.style.overflow = "hidden";
-                            ele.contentEditable = "false";
-                            ele.innerHTML = `!!LINK!![${""},${displayText},${linkCount}]`;
-                            messageDiv!.appendChild(ele);
-                        }
-                        messageDiv!.innerHTML += messageContent[i];
-                    }
-                    messageTagListener();
-                    document.getElementById("applyLinkGoToText")!.focus();
-                }
-            } else {
-                parentDiv!.removeChild(applyLinkDiv);
-                addLinkDivShowing = false;
-            }
+        //                     const ele = document.createElement("span");
+        //                     ele.style.display = "inline-flex";
+        //                     ele.style.width = "0";
+        //                     ele.style.height = "0";
+        //                     ele.style.overflow = "hidden";
+        //                     ele.contentEditable = "false";
+        //                     ele.innerHTML = `!!LINK!![${""},${displayText},${linkCount}]`;
+        //                     messageDiv!.appendChild(ele);
+        //                 }
+        //                 messageDiv!.innerHTML += messageContent[i];
+        //             }
+        //             messageTagListener();
+        //             document.getElementById("applyLinkGoToText")!.focus();
+        //         }
+        //     } else {
+        //         parentDiv!.removeChild(applyLinkDiv);
+        //         addLinkDivShowing = false;
+        //     }
             
-        }
+        // }
 
         function createNewTemplate(event: Event): boolean {
             event.preventDefault();
             const templateName = document.getElementById("newTemplateNameMobile");
-            const subjectDiv = document.getElementById("newTemplateSubjectContentMobile");
-            const contentDiv = document.getElementById("newTemplateMessageContentMobile");
+            const subjectDiv = document.getElementById("subjectDivHiddenInputMobile");
+            const contentDiv = document.getElementById("messageDivHiddenInputMobile");
+            const linksMetadata = linksRef.current;
             const s: string | undefined = Cookies.get("templates");
 
             const obj = {
                 templateName: templateName?.value || "",
-                subject: subjectDiv?.innerText || "",
-                message: contentDiv?.innerText || "", 
+                subject: subjectDiv?.value || "",
+                message: contentDiv?.value || "", 
+                linksMetadata: linksMetadata
             }
-
-            console.log("lmaoo")
 
             if (s === undefined) {
                 const t = {
@@ -777,11 +733,439 @@ export default function Templates() {
             }
         }
 
+        let linksRef = useRef<Record<number, {displayText: string, href: string}>>({});
+
+        function toggleAddlink() {
+            const visibleInput= document.getElementById("messageDivVisibleInputMobile"); 
+            const parent = document.getElementById("newTemplateContentMobile");
+            if (!addLinkDivShowing){
+                const hiddenInput = document.getElementById('messageDivHiddenInputMobile');
+                const count = hiddenInput!.selectionStart;
+                const e = hiddenInput!.selectionEnd;
+                const text = hiddenInput!.value.slice(count, e);
+
+                if (text === null) {
+                    alert("Please select the text to add link to.");
+                    return;
+                }
+
+                const applyLinkDiv = createApplyLinkDiv(10, 10, count, text, parent!);
+                parent!.appendChild(applyLinkDiv);
+            }
+        }
+
+        function createApplyLinkDiv(x: number, y: number, offset: number, displayText: string, parentNode: HTMLElement) {
+            const e = document.createElement("div");
+            const inputEle1 = document.createElement("input");
+            inputEle1.type = "text";
+            inputEle1.id = "applyLinkDisplayText"
+            inputEle1.className = "border-1 border-zinc-300 h-[40px] w-[180px] p-[10px] rounded-[2.5px] focus:outline-1 text-zinc-500";
+            inputEle1.placeholder = "Display Text";
+            inputEle1.disabled = true;
+            inputEle1.value = displayText;
+
+            const inputEle2 = document.createElement("input");
+            inputEle2.type = "text";
+            inputEle2.className = "border-1 border-zinc-300 h-[40px] w-[180px] p-[10px] rounded-[2.5px] focus:outline-1 text-zinc-500";
+            inputEle2.placeholder = "Go To Link";
+            inputEle2.id = "applyLinkGoToText";
+            inputEle2.oninput = (event) => {
+                if (event.target!.value !== '') {
+                    document.getElementById('applyLinkButton')!.style.backgroundColor = '#121212';
+                    document.getElementById('applyLinkButton')!.removeAttribute('disabled');  
+                } else {
+                    document.getElementById('applyLinkButton')!.style.backgroundColor = 'oklch(44.2% .017 285.786)';
+                    document.getElementById('applyLinkButton')!.disabled = 'true';
+                }
+            }
+
+            const inputButton = document.createElement("input");
+            inputButton.type = "button";
+            inputButton.className = "border-1 border-zinc-600 h-[40px] w-[80%] bg-zinc-500 text-white rounded-[2.5px] hover:cursor-pointer"
+            inputButton.value = "Apply Link"
+            inputButton.id = "applyLinkButton";
+            inputButton.disabled = true;
+            inputButton.onclick = ()=>{
+                const e1 = document.getElementById('applyLinkDisplayText');
+                const e2 = document.getElementById('applyLinkGoToText');
+
+                linksRef.current[offset] = {
+                    displayText: e1!.value,
+                    href: e2!.value,
+                }
+
+                formatDiv(document.getElementById('messageDivVisibleInput')!);
+                parentNode.removeChild(document.getElementById('applyLinkDiv')!);
+            };
+
+            const t = `absolute bg-white h-[200px] w-[200px] rounded-[5px] shadow-[0_4px_8px_0_rgba(0,0,0,0.2),0_6px_20px_0_rgba(0,0,0,0.19)] p-[10px] flex flex-col items-center justify-evenly z-1001`;
+            e.className = t;
+            e.style.top = `${y}px`;
+            e.style.left  = `${x}px`;
+            e.id = 'applyLinkDiv';
+            e.appendChild(inputEle1);
+            e.appendChild(inputEle2);
+            e.appendChild(inputButton);
+            return e;
+        }
+
+        function handleMessageInputChange() {            
+            const visibleInput= document.getElementById("messageDivVisibleInputMobile");
+            const hiddenInput = document.getElementById('messageDivHiddenInputMobile');
+            
+            visibleInput!.innerText = hiddenInput!.value
+            .replaceAll(/ {2,}/g, (match) => {
+                return '\u00A0'.repeat(match.length - 1) + ' ';
+            });
+            
+            formatDiv(visibleInput!);
+        }
+
+        function formatDiv(ele: HTMLElement, isSubjectDiv: boolean = false) {
+            let text
+            
+            if (isSubjectDiv) {
+                text = document.getElementById('subjectDivHiddenInputMobile')!.value
+                .replaceAll(/ {2,}/g, (match) => {
+                    return '\u00A0'.repeat(match.length - 1) + ' ';
+                });
+            } else {
+                text = document.getElementById('messageDivHiddenInputMobile')!.value
+                .replaceAll(/ {2,}/g, (match) => {
+                    return '\u00A0'.repeat(match.length - 1) + ' ';
+                });
+            }
+
+            ele.innerHTML = "";
+
+            let currentWord = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                
+                if (linksRef.current[i] !== undefined && !isSubjectDiv) {
+                    console.log(linksRef);
+                    ele.innerHTML += currentWord;
+                    const e = document.createElement('a');
+                    e.className = "text-blue-500 underline"
+                    e.innerText = linksRef.current[i].displayText;
+                    e.href = linksRef.current[i].href;
+                    ele.appendChild(e);
+                    i += linksRef.current[i].displayText.length-1;
+                    currentWord = '';
+                } else if (char === '\n' ||char === '.' || char === '\u00A0' || char === ' ' || char === ',' || char === ';' || (i === text.length-1)) {
+                    if (currentWord === '@companyName') {
+                        const e = createCompanyNameSpan();
+                        ele.appendChild(e);
+                    } else if (currentWord === '@generatedText') {
+                        const e = createGeneratedTextNameSpan();
+                        ele.appendChild(e);
+                    } else {
+                        ele.innerHTML += currentWord;
+                    }
+                    
+                    if (char === '\n' && (i === text.length-1)) {
+                        const e = document.createElement('br');
+                        ele.appendChild(e);
+                    }
+                    
+                    ele.innerHTML += char; 
+                    currentWord = '';
+                } else {
+                    currentWord += char;
+                }
+
+            }
+
+        }
+
+        function handleSubjectInput(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+            if (event.key === 'Insert' || event.key === 'Delete') {
+                event.preventDefault();
+                return;
+            }
+
+            const ele = document.getElementById('subjectDivHiddenInputMobile');
+            const visibleInput= document.getElementById("subjectDivVisibleInputMobile");
+            const ignoredKeys = new Set([
+                'Shift',
+                'Control',
+                'Alt',
+                'Meta',
+                'ArrowLeft',
+                'ArrowRight',
+                'ArrowUp',
+                'ArrowDown',
+                'Tab',
+                'CapsLock',
+                'Escape',
+                'Home',
+                'End',
+                'PageUp',
+                'PageDown',
+                'NumLock',
+                'ScrollLock',
+                'Pause',
+                'ContextMenu',
+                'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12',
+              ]);
+            
+            if (event.key === "Backspace") {
+                const selStart = ele!.selectionStart;
+                const selEnd = ele!.selectionEnd;
+
+                let lenSelText = selEnd - selStart;
+                const newLinks: Record<number, {displayText: string, href: string}> = {};
+
+                if (selStart === 0) {
+                    for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                        if (Number(c) >= selEnd-1) {
+                            newLinks[Number(c)-(lenSelText)] = linkObj;
+                        }
+                    }
+                    linksRef.current = newLinks;
+                    formatDiv(visibleInput!, true);
+                    return;
+                }
+
+                if (lenSelText === 0) {
+                    lenSelText++;
+                }
+
+                for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                    if (Number(c) > selEnd-1) {
+                        newLinks[Number(c)-(lenSelText)] = linkObj;
+                    } else if (Number(c) < selEnd && (Number(c)+linkObj.displayText.length) > selEnd) {
+                        if (lenSelText >= linkObj.displayText.length) {
+                            continue;
+                        } else {
+                            let newDisplayText = '';
+
+                            for(let i = 0; i < linkObj.displayText.length; i++){
+                                if (i >= (selStart-1-Number(c)) && i <= (selEnd-1-Number(c))) {
+                                    continue;
+                                } else {
+                                    newDisplayText += linkObj.displayText[i];
+                                }
+                            }
+
+                            const newLinkObj = {
+                                displayText: newDisplayText,
+                                href: linkObj.href,
+                            }
+
+                            newLinks[Number(c)] = newLinkObj;
+                        }
+                    } else if (selStart === Number(c)+linkObj.displayText.length && selStart === selEnd) {
+                        continue;
+                    } else {
+                        newLinks[Number(c)] = linkObj;
+                    }
+                }
+
+                linksRef.current = newLinks;
+                formatDiv(visibleInput!, true);
+            } else if (!ignoredKeys.has(event.key)) {
+                const selStart = ele!.selectionStart;
+                const selEnd = ele!.selectionEnd;
+
+                let lenSelText = selEnd - selStart;
+
+                if (lenSelText === 0) {
+                    lenSelText++;
+                }
+
+                const newLinks: Record<number, {displayText: string, href: string}> = {};
+                for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                    if (Number(c) >= selEnd-1) {
+                        if (lenSelText === 1) {
+                            newLinks[Number(c)+1] = linkObj;
+                        } else {
+                            newLinks[Number(c)+1-lenSelText] = linkObj;
+                        }   
+                        
+                    } else {
+                        newLinks[Number(c)] = linkObj;
+                    }
+                }
+                linksRef.current = newLinks;
+            }
+            
+            
+        }
+
+        function handleSubjectInputChange() {           
+            const visibleInput= document.getElementById("subjectDivVisibleInputMobile");
+            const hiddenInput = document.getElementById('subjectDivHiddenInputMobile');
+            
+            visibleInput!.innerText = hiddenInput!.value
+            .replaceAll(/ {2,}/g, (match) => {
+                return '\u00A0'.repeat(match.length - 1) + ' ';
+            });
+            
+            formatDiv(visibleInput!, true);
+        }
+
+        function handleMessageInput(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+            if (event.key === 'Insert' || event.key === 'Delete') {
+                event.preventDefault();
+                return;
+            }
+
+            const ele = document.getElementById('messageDivHiddenInputMobile');
+            const visibleInput= document.getElementById("messageDivVisibleInputMobile");
+            const ignoredKeys = new Set([
+                'Shift',
+                'Control',
+                'Alt',
+                'Meta',
+                'ArrowLeft',
+                'ArrowRight',
+                'ArrowUp',
+                'ArrowDown',
+                'Tab',
+                'CapsLock',
+                'Escape',
+                'Home',
+                'End',
+                'PageUp',
+                'PageDown',
+                'NumLock',
+                'ScrollLock',
+                'Pause',
+                'ContextMenu',
+                'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12',
+              ]);
+            
+            if (event.key === "Backspace") {
+                const selStart = ele!.selectionStart;
+                const selEnd = ele!.selectionEnd;
+
+                let lenSelText = selEnd - selStart;
+                const newLinks: Record<number, {displayText: string, href: string}> = {};
+
+                if (selStart === 0) {
+                    for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                        if (Number(c) >= selEnd-1) {
+                            newLinks[Number(c)-(lenSelText)] = linkObj;
+                        }
+                    }
+                    linksRef.current = newLinks;
+                    formatDiv(visibleInput!);
+                    return;
+                }
+
+                if (lenSelText === 0) {
+                    lenSelText++;
+                }
+
+                for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                    if (Number(c) > selEnd-1) {
+                        newLinks[Number(c)-(lenSelText)] = linkObj;
+                    } else if (Number(c) < selEnd && (Number(c)+linkObj.displayText.length) > selEnd) {
+                        if (lenSelText >= linkObj.displayText.length) {
+                            continue;
+                        } else {
+                            let newDisplayText = '';
+
+                            for(let i = 0; i < linkObj.displayText.length; i++){
+                                if (i >= (selStart-1-Number(c)) && i <= (selEnd-1-Number(c))) {
+                                    continue;
+                                } else {
+                                    newDisplayText += linkObj.displayText[i];
+                                }
+                            }
+
+                            const newLinkObj = {
+                                displayText: newDisplayText,
+                                href: linkObj.href,
+                            }
+
+                            newLinks[Number(c)] = newLinkObj;
+                        }
+                    } else if (selStart === Number(c)+linkObj.displayText.length && selStart === selEnd) {
+                        continue;
+                    } else {
+                        newLinks[Number(c)] = linkObj;
+                    }
+                }
+
+                linksRef.current = newLinks;
+                formatDiv(visibleInput!);
+            } else if (!ignoredKeys.has(event.key)) {
+                const selStart = ele!.selectionStart;
+                const selEnd = ele!.selectionEnd;
+
+                let lenSelText = selEnd - selStart;
+
+                if (lenSelText === 0) {
+                    lenSelText++;
+                }
+
+                const newLinks: Record<number, {displayText: string, href: string}> = {};
+                for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                    if (Number(c) >= selEnd-1) {
+                        if (lenSelText === 1) {
+                            newLinks[Number(c)+1] = linkObj;
+                        } else {
+                            newLinks[Number(c)+1-lenSelText] = linkObj;
+                        }   
+                        
+                    } else {
+                        newLinks[Number(c)] = linkObj;
+                    }
+                }
+                linksRef.current = newLinks;
+            }
+            
+            
+        }
+
         useEffect(()=>{
             const form = document.getElementById("newTemplateFormMobile");
             form!.addEventListener("submit", (event)=>{
                 createNewTemplate(event);
+            });
+
+            document.addEventListener('mousedown', (event) => {
+                const applyLinkDiv = document.getElementById('applyLinkDiv');
+                const parent = document.getElementById('newTemplateContentMobile')
+                if (applyLinkDiv !== null && !applyLinkDiv.contains(event.target as Node)) {
+                    parent!.removeChild(applyLinkDiv);
+                }
             })
+
+            const messageDivHiddenInput = document.getElementById('messageDivHiddenInputMobile');
+            const messageDivVisibleInput = document.getElementById('messageDivVisibleInputMobile');
+            messageDivHiddenInput!.addEventListener('scroll', () => {
+                messageDivVisibleInput!.scrollTop = messageDivHiddenInput!.scrollTop;
+
+                if (messageDivHiddenInput!.scrollTop > messageDivHiddenInput!.scrollHeight - messageDivHiddenInput!.clientHeight) {
+                    messageDivHiddenInput!.scrollTop = messageDivHiddenInput!.scrollHeight - messageDivHiddenInput!.clientHeight;
+                    messageDivVisibleInput!.scrollTop = messageDivVisibleInput!.scrollHeight - messageDivVisibleInput!.clientHeight;
+                  }
+            });
+
+            messageDivHiddenInput!.addEventListener('input', () => {
+                messageDivHiddenInput!.scrollTop = messageDivHiddenInput!.scrollHeight;
+                messageDivVisibleInput!.scrollTop = messageDivVisibleInput!.scrollHeight;
+            });
+
+            const subjectDivHiddenInput = document.getElementById('subjectDivHiddenInputMobile');
+            const subjectDivVisibleInput = document.getElementById('subjectDivVisibleInputMobile');
+            subjectDivHiddenInput!.addEventListener('scroll', () => {
+                subjectDivVisibleInput!.scrollTop = subjectDivHiddenInput!.scrollTop;
+
+                if (subjectDivHiddenInput!.scrollTop > subjectDivHiddenInput!.scrollHeight - subjectDivHiddenInput!.clientHeight) {
+                    subjectDivHiddenInput!.scrollTop = subjectDivHiddenInput!.scrollHeight - subjectDivHiddenInput!.clientHeight;
+                    subjectDivVisibleInput!.scrollTop = subjectDivVisibleInput!.scrollHeight - subjectDivVisibleInput!.clientHeight;
+                  }
+            });
+
+            subjectDivHiddenInput!.addEventListener('input', () => {
+                subjectDivHiddenInput!.scrollTop = subjectDivHiddenInput!.scrollHeight;
+                subjectDivVisibleInput!.scrollTop =subjectDivVisibleInput!.scrollHeight;
+            });
+
         }, [])
 
         return (
@@ -869,26 +1253,10 @@ export default function Templates() {
                                                 alt="copy"
                                             />
                                         </div>
-                                        <div id="newTemplateSubjectMobile" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap hover:cursor-text" onClick={() => {
-                                            
-                                            if (!subjectActive) {
-                                                const d = document.getElementById("newTemplateSubjectMobile")
-                                                d!.innerText = "";
-                                                d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateSubjectContentMobile"></p>`
-                                                const e = document.getElementById("newTemplateSubjectContentMobile") 
-                                                e!.focus();
-                                                e!.addEventListener("input", (event) => {
-                                                    subjectTagListener();
-                                                })
-
-                                                e!.addEventListener("keydown", (event) => {
-                                                    subjectKeyListener(event);
-                                                })
-                                                e!.style.color = "#121212";
-                                                subjectActive = true;
-                                            }
-
-                                        }}>Enter the subject of your email</div>
+                                        <div id="newTemplateSubjectMobile" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap hover:cursor-text relative">
+                                            <p className="absolute overflow-y-scroll text-black w-full h-full z-[999] top-0 left-0 p-[10px] break-words whitespace-wrap whitespace-pre-line" id='subjectDivVisibleInputMobile'></p>
+                                            <textarea className="absolute text-transparent caret-black bg-transparent w-full h-full z-1000 top-0 left-0 p-[10px] text-wrap whitespace-normal break-words resize-none placeholder-zinc-300 overscroll-y-none" contentEditable={true} onKeyDown={handleSubjectInput} onChange={handleSubjectInputChange} id='subjectDivHiddenInputMobile' placeholder="Enter the subject of your mail"></textarea>
+                                        </div>
                                         <br />
                                         <div className="flex items-center h-[20px] mb-[5px]">
                                             <p className="text-[#121212] text-sm mr-[10px]">Message Content</p>
@@ -899,26 +1267,10 @@ export default function Templates() {
                                                 alt="copy"
                                             />
                                         </div>
-                                        <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 overflow-y-scroll rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 hover:cursor-text relative" id="newTemplateContentMobile" onClick={() => {
-                                            if (!contentActive) {
-                                                const d = document.getElementById("newTemplateContentMobile")
-                                                d!.innerText = "";
-                                                d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateMessageContentMobile"></p>`
-                                                const e = document.getElementById("newTemplateMessageContentMobile") 
-                                                e!.focus();
-                                                // e!.addEventListener("keydown", (event) => {
-                                                //     console.log(event.key)
-                                                //     messageTagListener();
-                                                // })
-
-                                                e!.addEventListener("keydown", (event) => {
-                                                    messageKeyListener(event);
-                                                })
-                                                e!.style.color = "#121212";
-                                                contentActive = true;
-                                            }
-                                            
-                                        }}>Enter the content of your email</div>
+                                        <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 overflow-y-scroll rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 relative" id="newTemplateContentMobile">
+                                            <p className="absolute text-black w-full h-full z-[999] top-0 left-0 p-[10px] overflow-y-scroll break-words whitespace-wrap whitespace-pre-line" id='messageDivVisibleInputMobile'></p>
+                                            <textarea className="absolute text-transparent caret-black bg-transparent w-full h-full z-1000 top-0 left-0 p-[10px] text-wrap overflow-y-scroll whitespace-normal break-words resize-none placeholder-zinc-300 overscroll-y-none" contentEditable={true} onKeyDown={handleMessageInput} onChange={handleMessageInputChange} id='messageDivHiddenInputMobile' placeholder="Enter the content of your mail"></textarea>
+                                        </div>
                                         <div className="w-full h-[45px] p-[10px]">
 
                                         </div>
@@ -1382,41 +1734,59 @@ export default function Templates() {
             const url = gotoTextInput!.value;
             messageTagListener(url);
             const parentDiv = document.getElementById("newTemplateForm");
-            parentDiv!.removeChild(applyLinkDiv);
+            //parentDiv!.removeChild(applyLinkDiv);
             addLinkDivShowing = false;
         }
 
-        function createApplyLinkDiv(x: number, y: number) {
+        function createApplyLinkDiv(x: number, y: number, offset: number, displayText: string, parentNode: HTMLElement) {
             const e = document.createElement("div");
             const inputEle1 = document.createElement("input");
             inputEle1.type = "text";
             inputEle1.id = "applyLinkDisplayText"
             inputEle1.className = "border-1 border-zinc-300 h-[40px] w-[180px] p-[10px] rounded-[2.5px] focus:outline-1 text-zinc-500";
             inputEle1.placeholder = "Display Text";
+            inputEle1.disabled = true;
+            inputEle1.value = displayText;
 
             const inputEle2 = document.createElement("input");
             inputEle2.type = "text";
             inputEle2.className = "border-1 border-zinc-300 h-[40px] w-[180px] p-[10px] rounded-[2.5px] focus:outline-1 text-zinc-500";
             inputEle2.placeholder = "Go To Link";
-            inputEle2.id = "applyLinkGoToText"
-
-            inputEle2.addEventListener("input", () => {
-                addNewLinkEventListener(linkCount.toString());
-            });
-
+            inputEle2.id = "applyLinkGoToText";
+            inputEle2.oninput = (event) => {
+                if (event.target!.value !== '') {
+                    document.getElementById('applyLinkButton')!.style.backgroundColor = '#121212';
+                    document.getElementById('applyLinkButton')!.removeAttribute('disabled');  
+                } else {
+                    document.getElementById('applyLinkButton')!.style.backgroundColor = 'oklch(44.2% .017 285.786)';
+                    document.getElementById('applyLinkButton')!.disabled = 'true';
+                }
+            }
 
             const inputButton = document.createElement("input");
             inputButton.type = "button";
             inputButton.className = "border-1 border-zinc-600 h-[40px] w-[80%] bg-zinc-500 text-white rounded-[2.5px] hover:cursor-pointer"
             inputButton.value = "Apply Link"
-            inputButton.onclick = applyLink;
             inputButton.id = "applyLinkButton";
             inputButton.disabled = true;
+            inputButton.onclick = ()=>{
+                const e1 = document.getElementById('applyLinkDisplayText');
+                const e2 = document.getElementById('applyLinkGoToText');
+
+                linksRef.current[offset] = {
+                    displayText: e1!.value,
+                    href: e2!.value,
+                }
+
+                formatDiv(document.getElementById('messageDivVisibleInput')!);
+                parentNode.removeChild(document.getElementById('applyLinkDiv')!);
+            };
     
-            const t = `absolute bg-white h-[200px] w-[200px] rounded-[5px] shadow-[0_4px_8px_0_rgba(0,0,0,0.2),0_6px_20px_0_rgba(0,0,0,0.19)] p-[10px] flex flex-col items-center justify-evenly`;
+            const t = `absolute bg-white h-[200px] w-[200px] rounded-[5px] shadow-[0_4px_8px_0_rgba(0,0,0,0.2),0_6px_20px_0_rgba(0,0,0,0.19)] p-[10px] flex flex-col items-center justify-evenly z-1001`;
             e.className = t;
             e.style.top = `${y}px`;
             e.style.left  = `${x}px`;
+            e.id = 'applyLinkDiv';
             e.appendChild(inputEle1);
             e.appendChild(inputEle2);
             e.appendChild(inputButton);
@@ -1461,61 +1831,63 @@ export default function Templates() {
             return selection!.toString();
         }
 
-        function toggleAddlink() {
-            const parentDiv = document.getElementById("newTemplateForm")
-            const messageDiv = document.getElementById("newTemplateMessageContent")
+        // function toggleAddlink() {
+        //     const parentDiv = document.getElementById("newTemplateForm")
+        //     const messageDiv = document.getElementById("messageDivVisibleInput")
             
-            if (!addLinkDivShowing) {
-                const [calculatedX, calculatedY] = calculateApplyLinkDivPos();
-                applyLinkDiv = createApplyLinkDiv(calculatedX, calculatedY);
-                linkCount += 1;
-                parentDiv!.appendChild(applyLinkDiv)
+        //     if (!addLinkDivShowing) {
+        //         const [calculatedX, calculatedY] = calculateApplyLinkDivPos();
+        //         applyLinkDiv = createApplyLinkDiv(calculatedX, calculatedY);
+        //         linkCount += 1;
+        //         parentDiv!.appendChild(applyLinkDiv)
                 
-                const displayText = getSelectedText();
-                if (displayText === null) {
-                    addLinkDivShowing = false;
-                } else {
-                    cursorPositionBeforeLink = getCountCharactersBefore(messageDiv!);
-                    const d = document.getElementById("applyLinkDisplayText");
-                    d!.value = displayText;
-                    d!.disabled = "true";
-                    const messageContent = messageDiv!.innerText;
-                    messageDiv!.innerHTML = ""
-                    for (let i = 0; i < messageContent!.length; i++) {
-                        if (i === (cursorPositionBeforeLink - displayText.length)) {
+        //         const displayText = getSelectedText();
+        //         if (displayText === null) {
+        //             addLinkDivShowing = false;
+        //         } else {
+        //             cursorPositionBeforeLink = getCountCharactersBefore(messageDiv!);
+        //             const d = document.getElementById("applyLinkDisplayText");
+        //             d!.value = displayText;
+        //             d!.disabled = "true";
+        //             const messageContent = messageDiv!.innerText;
+        //             messageDiv!.innerHTML = ""
+        //             for (let i = 0; i < messageContent!.length; i++) {
+        //                 if (i === (cursorPositionBeforeLink - displayText.length)) {
                             
-                            const ele = document.createElement("span");
-                            ele.style.display = "inline-flex";
-                            ele.style.width = "0";
-                            ele.style.height = "0";
-                            ele.style.overflow = "hidden";
-                            ele.contentEditable = "false";
-                            ele.innerHTML = `!!LINK!![${""},${displayText},${linkCount}]`;
-                            messageDiv!.appendChild(ele);
-                        }
-                        messageDiv!.innerHTML += messageContent[i];
-                    }
-                    messageTagListener();
-                    document.getElementById("applyLinkGoToText")!.focus();
-                }
-            } else {
-                parentDiv!.removeChild(applyLinkDiv);
-                addLinkDivShowing = false;
-            }
+        //                     const ele = document.createElement("a");
+        //                     ele.style.display = "inline-flex";
+        //                     ele.style.width = "0";
+        //                     ele.style.height = "0";
+        //                     ele.style.overflow = "hidden";
+        //                     ele.contentEditable = "false";
+        //                     ele.innerHTML = `!!LINK!![${""},${displayText},${linkCount}]`;
+        //                     messageDiv!.appendChild(ele);
+        //                 }
+        //                 messageDiv!.innerHTML += messageContent[i];
+        //             }
+        //             formatDiv(messageDiv!);
+        //             document.getElementById("applyLinkGoToText")!.focus();
+        //         }
+        //     } else {
+        //         parentDiv!.removeChild(applyLinkDiv);
+        //         addLinkDivShowing = false;
+        //     }
             
-        }
+        // }
 
         function createNewTemplate(event: Event): boolean {
             event.preventDefault();
             const templateName = document.getElementById("newTemplateName");
-            const subjectDiv = document.getElementById("newTemplateSubjectContent");
-            const contentDiv = document.getElementById("newTemplateMessageContent");
+            const subjectDiv = document.getElementById("subjectDivHiddenInput");
+            const contentDiv = document.getElementById("messageDivHiddenInput");
+            const linksMetadata = linksRef.current;
             const s: string | undefined = Cookies.get("templates");
 
             const obj = {
                 templateName: templateName?.value || "",
-                subject: subjectDiv?.innerText || "",
-                message: contentDiv?.innerText || "", 
+                subject: subjectDiv?.value || "",
+                message: contentDiv?.value || "", 
+                linksMetadata: linksMetadata,
             }
 
             if (s === undefined) {
@@ -1546,7 +1918,380 @@ export default function Templates() {
             form!.addEventListener("submit", (event)=>{
                 createNewTemplate(event);
             })
+            
+            document.addEventListener('mousedown', (event) => {
+                const applyLinkDiv = document.getElementById('applyLinkDiv');
+                const parent = document.getElementById('newTemplateContent')
+                if (applyLinkDiv !== null && !applyLinkDiv.contains(event.target as Node)) {
+                    parent!.removeChild(applyLinkDiv);
+                }
+            })
+
+            const messageDivHiddenInput = document.getElementById('messageDivHiddenInput');
+            const messageDivVisibleInput = document.getElementById('messageDivVisibleInput');
+            messageDivHiddenInput!.addEventListener('scroll', () => {
+                messageDivVisibleInput!.scrollTop = messageDivHiddenInput!.scrollTop;
+
+                if (messageDivHiddenInput!.scrollTop > messageDivHiddenInput!.scrollHeight - messageDivHiddenInput!.clientHeight) {
+                    messageDivHiddenInput!.scrollTop = messageDivHiddenInput!.scrollHeight - messageDivHiddenInput!.clientHeight;
+                    messageDivVisibleInput!.scrollTop = messageDivVisibleInput!.scrollHeight - messageDivVisibleInput!.clientHeight;
+                  }
+            });
+
+            messageDivHiddenInput!.addEventListener('input', () => {
+                messageDivHiddenInput!.scrollTop = messageDivHiddenInput!.scrollHeight;
+                messageDivVisibleInput!.scrollTop = messageDivVisibleInput!.scrollHeight;
+            });
+
+            const subjectDivHiddenInput = document.getElementById('subjectDivHiddenInput');
+            const subjectDivVisibleInput = document.getElementById('subjectDivVisibleInput');
+            subjectDivHiddenInput!.addEventListener('scroll', () => {
+                subjectDivVisibleInput!.scrollTop = subjectDivHiddenInput!.scrollTop;
+
+                if (subjectDivHiddenInput!.scrollTop > subjectDivHiddenInput!.scrollHeight - subjectDivHiddenInput!.clientHeight) {
+                    subjectDivHiddenInput!.scrollTop = subjectDivHiddenInput!.scrollHeight - subjectDivHiddenInput!.clientHeight;
+                    subjectDivVisibleInput!.scrollTop = subjectDivVisibleInput!.scrollHeight - subjectDivVisibleInput!.clientHeight;
+                  }
+            });
+
+            subjectDivHiddenInput!.addEventListener('input', () => {
+                subjectDivHiddenInput!.scrollTop = subjectDivHiddenInput!.scrollHeight;
+                subjectDivVisibleInput!.scrollTop =subjectDivVisibleInput!.scrollHeight;
+            });
+
         }, [])
+
+        function formatDiv(ele: HTMLElement, isSubjectDiv: boolean = false) {
+            let text
+            
+            if (isSubjectDiv) {
+                text = document.getElementById('subjectDivHiddenInput')!.value
+                .replaceAll(/ {2,}/g, (match) => {
+                    return '\u00A0'.repeat(match.length - 1) + ' ';
+                });
+            } else {
+                text = document.getElementById('messageDivHiddenInput')!.value
+                .replaceAll(/ {2,}/g, (match) => {
+                    return '\u00A0'.repeat(match.length - 1) + ' ';
+                });
+            }
+
+            ele.innerHTML = "";
+
+            let currentWord = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                
+                if (linksRef.current[i] !== undefined && !isSubjectDiv) {
+                    console.log(linksRef);
+                    ele.innerHTML += currentWord;
+                    const e = document.createElement('a');
+                    e.className = "text-blue-500 underline"
+                    e.innerText = linksRef.current[i].displayText;
+                    e.href = linksRef.current[i].href;
+                    ele.appendChild(e);
+                    i += linksRef.current[i].displayText.length-1;
+                    currentWord = '';
+                } else if (char === '\n' ||char === '.' || char === '\u00A0' || char === ' ' || char === ',' || char === ';' || (i === text.length-1)) {
+                    if (currentWord === '@companyName') {
+                        const e = createCompanyNameSpan();
+                        ele.appendChild(e);
+                    } else if (currentWord === '@generatedText') {
+                        const e = createGeneratedTextNameSpan();
+                        ele.appendChild(e);
+                    } else {
+                        ele.innerHTML += currentWord;
+                    }
+                    
+                    if (char === '\n' && (i === text.length-1)) {
+                        const e = document.createElement('br');
+                        ele.appendChild(e);
+                    }
+                    
+                    ele.innerHTML += char; 
+                    currentWord = '';
+                } else {
+                    currentWord += char;
+                }
+
+            }
+
+        }
+
+        function handleSubjectInputChange() {           
+            const visibleInput= document.getElementById("subjectDivVisibleInput");
+            const hiddenInput = document.getElementById('subjectDivHiddenInput');
+            
+            visibleInput!.innerText = hiddenInput!.value
+            .replaceAll(/ {2,}/g, (match) => {
+                return '\u00A0'.repeat(match.length - 1) + ' ';
+            });
+            
+            formatDiv(visibleInput!, true);
+        }
+
+        function handleMessageInputChange() {            
+            const visibleInput= document.getElementById("messageDivVisibleInput");
+            const hiddenInput = document.getElementById('messageDivHiddenInput');
+            
+            visibleInput!.innerText = hiddenInput!.value
+            .replaceAll(/ {2,}/g, (match) => {
+                return '\u00A0'.repeat(match.length - 1) + ' ';
+            });
+            
+            formatDiv(visibleInput!);
+        }
+
+        function handleSubjectInput(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+            if (event.key === 'Insert' || event.key === 'Delete') {
+                event.preventDefault();
+                return;
+            }
+
+            const ele = document.getElementById('subjectDivHiddenInput');
+            const visibleInput= document.getElementById("subjectDivVisibleInput");
+            const ignoredKeys = new Set([
+                'Shift',
+                'Control',
+                'Alt',
+                'Meta',
+                'ArrowLeft',
+                'ArrowRight',
+                'ArrowUp',
+                'ArrowDown',
+                'Tab',
+                'CapsLock',
+                'Escape',
+                'Home',
+                'End',
+                'PageUp',
+                'PageDown',
+                'NumLock',
+                'ScrollLock',
+                'Pause',
+                'ContextMenu',
+                'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12',
+              ]);
+            
+            if (event.key === "Backspace") {
+                const selStart = ele!.selectionStart;
+                const selEnd = ele!.selectionEnd;
+
+                let lenSelText = selEnd - selStart;
+                const newLinks: Record<number, {displayText: string, href: string}> = {};
+
+                if (selStart === 0) {
+                    for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                        if (Number(c) >= selEnd-1) {
+                            newLinks[Number(c)-(lenSelText)] = linkObj;
+                        }
+                    }
+                    linksRef.current = newLinks;
+                    formatDiv(visibleInput!, true);
+                    return;
+                }
+
+                if (lenSelText === 0) {
+                    lenSelText++;
+                }
+
+                for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                    if (Number(c) > selEnd-1) {
+                        newLinks[Number(c)-(lenSelText)] = linkObj;
+                    } else if (Number(c) < selEnd && (Number(c)+linkObj.displayText.length) > selEnd) {
+                        if (lenSelText >= linkObj.displayText.length) {
+                            continue;
+                        } else {
+                            let newDisplayText = '';
+
+                            for(let i = 0; i < linkObj.displayText.length; i++){
+                                if (i >= (selStart-1-Number(c)) && i <= (selEnd-1-Number(c))) {
+                                    continue;
+                                } else {
+                                    newDisplayText += linkObj.displayText[i];
+                                }
+                            }
+
+                            const newLinkObj = {
+                                displayText: newDisplayText,
+                                href: linkObj.href,
+                            }
+
+                            newLinks[Number(c)] = newLinkObj;
+                        }
+                    } else if (selStart === Number(c)+linkObj.displayText.length && selStart === selEnd) {
+                        continue;
+                    } else {
+                        newLinks[Number(c)] = linkObj;
+                    }
+                }
+
+                linksRef.current = newLinks;
+                formatDiv(visibleInput!, true);
+            } else if (!ignoredKeys.has(event.key)) {
+                const selStart = ele!.selectionStart;
+                const selEnd = ele!.selectionEnd;
+
+                let lenSelText = selEnd - selStart;
+
+                if (lenSelText === 0) {
+                    lenSelText++;
+                }
+
+                const newLinks: Record<number, {displayText: string, href: string}> = {};
+                for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                    if (Number(c) >= selEnd-1) {
+                        if (lenSelText === 1) {
+                            newLinks[Number(c)+1] = linkObj;
+                        } else {
+                            newLinks[Number(c)+1-lenSelText] = linkObj;
+                        }   
+                        
+                    } else {
+                        newLinks[Number(c)] = linkObj;
+                    }
+                }
+                linksRef.current = newLinks;
+            }
+            
+            
+        }
+
+        function handleMessageInput(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+            if (event.key === 'Insert' || event.key === 'Delete') {
+                event.preventDefault();
+                return;
+            }
+
+            const ele = document.getElementById('messageDivHiddenInput');
+            const visibleInput= document.getElementById("messageDivVisibleInput");
+            const ignoredKeys = new Set([
+                'Shift',
+                'Control',
+                'Alt',
+                'Meta',
+                'ArrowLeft',
+                'ArrowRight',
+                'ArrowUp',
+                'ArrowDown',
+                'Tab',
+                'CapsLock',
+                'Escape',
+                'Home',
+                'End',
+                'PageUp',
+                'PageDown',
+                'NumLock',
+                'ScrollLock',
+                'Pause',
+                'ContextMenu',
+                'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12',
+              ]);
+            
+            if (event.key === "Backspace") {
+                const selStart = ele!.selectionStart;
+                const selEnd = ele!.selectionEnd;
+
+                let lenSelText = selEnd - selStart;
+                const newLinks: Record<number, {displayText: string, href: string}> = {};
+
+                if (selStart === 0) {
+                    for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                        if (Number(c) >= selEnd-1) {
+                            newLinks[Number(c)-(lenSelText)] = linkObj;
+                        }
+                    }
+                    linksRef.current = newLinks;
+                    formatDiv(visibleInput!);
+                    return;
+                }
+
+                if (lenSelText === 0) {
+                    lenSelText++;
+                }
+
+                for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                    if (Number(c) > selEnd-1) {
+                        newLinks[Number(c)-(lenSelText)] = linkObj;
+                    } else if (Number(c) < selEnd && (Number(c)+linkObj.displayText.length) > selEnd) {
+                        if (lenSelText >= linkObj.displayText.length) {
+                            continue;
+                        } else {
+                            let newDisplayText = '';
+
+                            for(let i = 0; i < linkObj.displayText.length; i++){
+                                if (i >= (selStart-1-Number(c)) && i <= (selEnd-1-Number(c))) {
+                                    continue;
+                                } else {
+                                    newDisplayText += linkObj.displayText[i];
+                                }
+                            }
+
+                            const newLinkObj = {
+                                displayText: newDisplayText,
+                                href: linkObj.href,
+                            }
+
+                            newLinks[Number(c)] = newLinkObj;
+                        }
+                    } else if (selStart === Number(c)+linkObj.displayText.length && selStart === selEnd) {
+                        continue;
+                    } else {
+                        newLinks[Number(c)] = linkObj;
+                    }
+                }
+
+                linksRef.current = newLinks;
+                formatDiv(visibleInput!);
+            } else if (!ignoredKeys.has(event.key)) {
+                const selStart = ele!.selectionStart;
+                const selEnd = ele!.selectionEnd;
+
+                let lenSelText = selEnd - selStart;
+
+                if (lenSelText === 0) {
+                    lenSelText++;
+                }
+
+                const newLinks: Record<number, {displayText: string, href: string}> = {};
+                for(let [c, linkObj] of Object.entries(linksRef.current)) {
+                    if (Number(c) >= selEnd-1) {
+                        if (lenSelText === 1) {
+                            newLinks[Number(c)+1] = linkObj;
+                        } else {
+                            newLinks[Number(c)+1-lenSelText] = linkObj;
+                        }   
+                        
+                    } else {
+                        newLinks[Number(c)] = linkObj;
+                    }
+                }
+                linksRef.current = newLinks;
+            }
+            
+            
+        }
+
+        let linksRef = useRef<Record<number, {displayText: string, href: string}>>({});
+
+        function toggleAddlink() {
+            const visibleInput= document.getElementById("messageDivVisibleInput"); 
+            const parent = document.getElementById("newTemplateContent");
+            if (!addLinkDivShowing){
+                const hiddenInput = document.getElementById('messageDivHiddenInput');
+                const count = hiddenInput!.selectionStart;
+                const e = hiddenInput!.selectionEnd;
+                const text = hiddenInput!.value.slice(count, e);
+
+                if (text === null) {
+                    alert("Please select the text to add link to.");
+                    return;
+                }
+
+                const applyLinkDiv = createApplyLinkDiv(10, 10, count, text, parent!);
+                parent!.appendChild(applyLinkDiv);
+            }
+        }
 
         return  (
             <div className="w-full h-full bg-white select-none" style={{fontFamily: "Poppins"}}>
@@ -1673,7 +2418,7 @@ export default function Templates() {
                                 </div>
                                 <div className="flex flex-col justify-center items-center">
                                     <div className="rounded-[5px] border-1 border-zinc-300 p-[10px] w-[500px] flex flex-col flex-center items-center">
-                                        <form className="w-full" id="newTemplateForm">
+                                        <form className="w-ful" id="newTemplateForm">
                                             <input className="h-[50px] w-full text-3xl text-[#121212] font-semibold focus:outline-none" type="text" id="newTemplateName" value={currentTemplateIndex === 0 ? newTemplateName : templates[currentTemplateIndex-1]["templateName"]} onChange={(e)=>{setNewTemplateName(e.target.value)}} autoComplete="off"/>
                                             <p className="text-zinc-400">Fill in the details below to create a new template.</p>
                                             <br />
@@ -1686,26 +2431,10 @@ export default function Templates() {
                                                     alt="copy"
                                                 />
                                             </div>
-                                            <div id="newTemplateSubject" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap hover:cursor-text" onClick={() => {
-                                                
-                                                if (!subjectActive) {
-                                                    const d = document.getElementById("newTemplateSubject")
-                                                    d!.innerText = "";
-                                                    d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateSubjectContent"></p>`
-                                                    const e = document.getElementById("newTemplateSubjectContent") 
-                                                    e!.focus();
-                                                    e!.addEventListener("input", (event) => {
-                                                        subjectTagListener();
-                                                    })
-
-                                                    e!.addEventListener("keydown", (event) => {
-                                                        subjectKeyListener(event);
-                                                    })
-                                                    e!.style.color = "#121212";
-                                                    subjectActive = true;
-                                                }
-
-                                            }}>Enter the subject of your email</div>
+                                            <div id="newTemplateSubject" className="min-h-[40px] w-full border-1 border-zinc-300 p-[10px] pt-0 pb-0 text-zinc-300 rounded-[2.5px] flex flex-col justify-center focus:outline-zinc-400 focus:outline-offset-5 text-wrap hover:cursor-text relative">
+                                                <p className="absolute overflow-y-scroll text-black w-full h-full z-[999] top-0 left-0 p-[10px] break-words whitespace-wrap whitespace-pre-line" id='subjectDivVisibleInput'></p>
+                                                <textarea className="absolute text-transparent caret-black bg-transparent w-full h-full z-1000 top-0 left-0 p-[10px] text-wrap whitespace-normal break-words resize-none placeholder-zinc-300 overscroll-y-none" contentEditable={true} onKeyDown={handleSubjectInput} onChange={handleSubjectInputChange} id='subjectDivHiddenInput' placeholder="Enter the subject of your mail"></textarea>
+                                            </div>
                                             <br />
                                             <div className="flex items-center h-[20px] mb-[5px]">
                                                 <p className="text-[#121212] text-sm mr-[10px]">Message Content</p>
@@ -1716,26 +2445,10 @@ export default function Templates() {
                                                     alt="copy"
                                                 />
                                             </div>
-                                            <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 overflow-y-scroll rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 hover:cursor-text relative" id="newTemplateContent" onClick={() => {
-                                                if (!contentActive) {
-                                                    const d = document.getElementById("newTemplateContent")
-                                                    d!.innerText = "";
-                                                    d!.innerHTML = `<p contenteditable="true" class="focus:outline-none whitespace-pre text-wrap" style="text-wrap:auto" id="newTemplateMessageContent"></p>`
-                                                    const e = document.getElementById("newTemplateMessageContent") 
-                                                    e!.focus();
-                                                    // e!.addEventListener("keydown", (event) => {
-                                                    //     console.log(event.key)
-                                                    //     messageTagListener();
-                                                    // })
-
-                                                    e!.addEventListener("keydown", (event) => {
-                                                        messageKeyListener(event);
-                                                    })
-                                                    e!.style.color = "#121212";
-                                                    contentActive = true;
-                                                }
-                                                
-                                            }}>Enter the content of your email</div>
+                                            <div className="h-[300px] w-full pl-[10px] pt-[10px] text-zinc-300 border-1 border-zinc-300 overflow-y-scroll rounded-[2.5px] p-[10px] focus:outline-offset-5 text-wrap focus:outline-zinc-400 relative" id="newTemplateContent">
+                                                <p className="absolute text-black w-full h-full z-[999] top-0 left-0 p-[10px] overflow-y-scroll break-words whitespace-wrap whitespace-pre-line" id='messageDivVisibleInput'></p>
+                                                <textarea className="absolute text-transparent caret-black bg-transparent w-full h-full z-1000 top-0 left-0 p-[10px] text-wrap overflow-y-scroll whitespace-normal break-words resize-none placeholder-zinc-300 overscroll-y-none" contentEditable={true} onKeyDown={handleMessageInput} onChange={handleMessageInputChange} id='messageDivHiddenInput' placeholder="Enter the content of your mail"></textarea>
+                                            </div>
                                             <div className="w-full h-[45px] p-[10px]">
 
                                             </div>
